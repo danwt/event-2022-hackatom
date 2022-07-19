@@ -24,6 +24,7 @@ rm simon_keypair.json
 
 # Build genesis file and node directory structure
 interchain-security-pd init --chain-id provider simon --home ${HOME_DIR}/provider
+
 jq ".app_state.gov.voting_params.voting_period = \"3s\"" \
    ${HOME_DIR}/provider/config/genesis.json > \
    ${HOME_DIR}/provider/edited_genesis.json && mv ${HOME_DIR}/provider/edited_genesis.json ${HOME_DIR}/provider/config/genesis.json
@@ -48,8 +49,11 @@ interchain-security-pd collect-gentxs --home ${HOME_DIR}/provider --gentx-dir ${
 sleep 1
 
 sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${NODE_IP}:26658\"/" ${HOME_DIR}/provider/config/client.toml
-sed -i -r 's/timeout_commit = "5s"/timeout_commit = "3s"/g' ${HOME_DIR}/provider/config/config.toml
-sed -i -r 's/timeout_propose = "3s"/timeout_propose = "1s"/g' ${HOME_DIR}/provider/config/config.toml
+dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_commit 5s
+dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_commit 5s
+dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_propose 1s
+dasel put bool -f ${HOME_DIR}/provider/config/app.toml .api.enable true
+dasel put bool -f ${HOME_DIR}/provider/config/app.toml .grpc-web.enable-unsafe-cors true
 
 # Start gaia
 interchain-security-pd start --home ${HOME_DIR}/provider --rpc.laddr tcp://${NODE_IP}:26658 --grpc.address $NODE_IP:9091 \
