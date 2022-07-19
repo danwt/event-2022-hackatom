@@ -103,7 +103,7 @@ DELEGATIONS=$(interchain-security-pd q staking delegations \
 	$(jq -r .address simon_keypair.json) \
 	--home ${HOME_DIR}/provider -o json)
 
-echo $DE
+echo $DELEGATIONS
 
 OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.validator_address)
 
@@ -118,58 +118,3 @@ sleep 13
 
 interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/provider
 interchain-security-cd q tendermint-validator-set --home ${HOME_DIR}/consumer
-
-
-# rm -rf ${HOME_DIR}/provider2
-# interchain-security-pd init --chain-id provider rick --home ${HOME_DIR}/provider2
-# interchain-security-pd keys add rick --home ${HOME_DIR}/provider2 --keyring-backend test --output json > rick_keypair.json 2>&1
-# cp ${HOME_DIR}/provider/config/genesis.json ${HOME_DIR}/provider2/config/genesis.json
-# echo '{"height": "0","round": 0,"step": 0}' > ${HOME_DIR}/provider2/data/priv_validator_state.json
-
-# sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${NODE_IP}:26638\"/" ${HOME_DIR}/provider2/config/client.toml
-
-# NODE_SIMON_ID=$(interchain-security-pd tendermint show-node-id --home ${HOME_DIR}/provider)
-# interchain-security-pd start --home ${HOME_DIR}/provider2 \
-#         --rpc.laddr tcp://${NODE_IP}:26638 \
-#         --grpc.address ${NODE_IP}:9071 \
-#         --address tcp://${NODE_IP}:26635 \
-#         --p2p.laddr tcp://${NODE_IP}:26636 \
-#         --grpc-web.enable=false \
-#         --p2p.persistent_peers ${NODE_SIMON_ID}@${NODE_IP}:26656 \
-#         &> ${HOME_DIR}/provider2/logs &
-
-
-# sleep 5
-# interchain-security-pd tx bank send $(jq -r .address simon_keypair.json) $(jq -r .address rick_keypair.json) 10000000stake --from simon --home ${HOME_DIR}/provider --chain-id provider --keyring-backend test -y -b block
-# interchain-security-pd q bank balances $(jq -r .address rick_keypair.json) --home ${HOME_DIR}/provider
-
-VAL_PUBKEY=$(interchain-security-pd tendermint show-validator --home ${HOME_DIR}/provider2)
-interchain-security-pd tx staking create-validator \
-            --amount 10000000stake \
-            --pubkey $VAL_PUBKEY \
-            --from simon \
-            --keyring-backend test \
-            --home ./provider \
-            --chain-id provider \
-            --commission-max-change-rate 0.01 \
-            --commission-max-rate 0.2 \
-            --commission-rate 0.1 \
-            --moniker rick \
-            --min-self-delegation 1 \
-            --node tcp://${NODE_IP}:26658 \
-            -b block -y
-
-# hermes clear packets provider parent channel-0
-
-# interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/provider
-# interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/provider2
-# interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/consumer
-
-
-# interchain-security-pd tx bank send cosmos1yeyj3s7y2zpaevjts7qeeyrg8nhguqs9ng5z77 \
-#        	cosmos1sttpmvka63zjltd5xh834m3mft3elhw67qn8ul \
-# 	10000000stake \
-# 	--from simon \
-# 	--home ${HOME_DIR}/provider \
-#        	--chain-id provider \
-#        	--keyring-backend test -y -b block

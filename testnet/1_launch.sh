@@ -18,9 +18,9 @@ rm -rf ${HOME_DIR}/provider
 # Clean start
 killall interchain-security-cd &> /dev/null || true
 rm -rf ${HOME_DIR}/consumer
-rm consumer-proposal.json
-rm simon_cons_keypair.json
-rm simon_keypair.json
+rm -f consumer-proposal.json
+rm -f simon_cons_keypair.json
+rm -f simon_keypair.json
 
 # Build genesis file and node directory structure
 interchain-security-pd init --chain-id provider simon --home ${HOME_DIR}/provider
@@ -49,11 +49,10 @@ interchain-security-pd collect-gentxs --home ${HOME_DIR}/provider --gentx-dir ${
 sleep 1
 
 sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${NODE_IP}:26658\"/" ${HOME_DIR}/provider/config/client.toml
-dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_commit 5s
-dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_commit 5s
+dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_commit 3s
 dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_propose 1s
 dasel put bool -f ${HOME_DIR}/provider/config/app.toml .api.enable true
-dasel put bool -f ${HOME_DIR}/provider/config/app.toml .grpc-web.enable-unsafe-cors true
+dasel put bool -f ${HOME_DIR}/provider/config/app.toml .api.enabled-unsafe-cors true
 
 # Start gaia
 interchain-security-pd start --home ${HOME_DIR}/provider --rpc.laddr tcp://${NODE_IP}:26658 --grpc.address $NODE_IP:9091 \
@@ -90,7 +89,6 @@ interchain-security-pd tx gov vote 1 yes --from simon --chain-id provider --home
 sleep 5
 
 ## CONSUMER CHAIN ##
-
 
 # Build genesis file and node directory structure
 interchain-security-cd init --chain-id consumer simon --home ${HOME_DIR}/consumer
