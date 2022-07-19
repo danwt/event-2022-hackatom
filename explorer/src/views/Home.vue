@@ -1,23 +1,6 @@
 <template>
   <div class="text-center container-lg">
     <full-header />
-    <b-link>
-      <div class="d-flex justify-content-center align-items-center">
-        <vuexy-logo />
-        <h1
-          class="text-primary display-4 font-weight-bolder d-none d-md-block"
-        >
-          Ping Explorer<small class="flow-left">Beta</small>
-        </h1>
-      </div>
-    </b-link>
-
-    <p class="mb-1">
-      Ping explorer is not just an explorer but also a wallet and more ... 🛠
-    </p>
-    <h2 class="mb-3">
-      Cosmos Ecosystem Blockchains 🚀
-    </h2>
 
     <div>
       <b-row class="match-height">
@@ -119,7 +102,7 @@
 <script>
 /* eslint-disable global-require */
 import {
-  BLink, BAvatar, BRow, BCol, BCard, BCardText, BCardTitle, BDropdown, BDropdownItem,
+  BAvatar, BRow, BCol, BCard, BCardText, BCardTitle, BDropdown, BDropdownItem,
 } from 'bootstrap-vue'
 import Ripple from 'vue-ripple-directive'
 import VuexyLogo from '@core/layouts/components/Logo.vue'
@@ -130,7 +113,6 @@ import FullHeader from './components/FullHeader.vue'
 
 export default {
   components: {
-    BLink,
     BAvatar,
     BRow,
     BCol,
