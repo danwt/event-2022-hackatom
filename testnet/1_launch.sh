@@ -173,10 +173,6 @@ rm ${H}/consumer_gen.json
 
 dasel put string -f ${H}/consumer/config/genesis.json .app_state.gov.voting_params.voting_period 3s
 dasel put string -f ${H}/consumer/config/genesis.json .app_state.staking.params.unbonding_time 600s
-jq ".app_state.gov.voting_params.voting_period = \"3s\" | .app_state.staking.params.unbonding_time = \"600s\""\
-    ${H}/consumer/config/genesis.json\
-    > ${H}/consumer/edited_genesis.json\
-    && mv ${H}/consumer/edited_genesis.json ${H}/consumer/config/genesis.json
 
 # Create validator states
 echo '{"height": "0","round": 0,"step": 0}' > ${H}/consumer/data/priv_validator_state.json
@@ -186,7 +182,7 @@ cp ${H}/provider/config/priv_validator_key.json ${H}/consumer/config/priv_valida
 cp ${H}/provider/config/node_key.json ${H}/consumer/config/node_key.json
 
 # Set default client port
-sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${NODE_IP}:26648\"/" ${H}/consumer/config/client.toml
+dasel put string -f ${H}/consumer/config/client.toml .node "tcp://${NODE_IP}:26648"
 
 # Start giaia
 $CBIN start --home ${H}/consumer \

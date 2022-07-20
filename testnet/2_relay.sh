@@ -1,15 +1,11 @@
 #!/bin/bash
 set -eux 
 
-# User balance of stake tokens 
-USER_COINS="100000000000stake"
-# Amount of stake tokens staked
-STAKE="100000000stake"
 # Node IP address
 NODE_IP="127.0.0.1"
 
 # Home directory
-HOME_DIR="."
+H="."
 
 # Setup Hermes in packet relayer mode
 
@@ -96,12 +92,12 @@ sleep 5
 
 hermes -j start &> ~/.hermes/logs &
 
-interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/provider
-interchain-security-cd q tendermint-validator-set --home ${HOME_DIR}/consumer
+interchain-security-pd q tendermint-validator-set --home ${H}/provider
+interchain-security-cd q tendermint-validator-set --home ${H}/consumer
 
 DELEGATIONS=$(interchain-security-pd q staking delegations \
 	$(jq -r .address fizz_keypair.json) \
-	--home ${HOME_DIR}/provider -o json)
+	--home ${H}/provider -o json)
 
 echo $DELEGATIONS
 
@@ -110,11 +106,11 @@ OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.va
 interchain-security-pd tx staking delegate $OPERATOR_ADDR 1000000stake \
        	--from fizz \
        	--keyring-backend test \
-       	--home ${HOME_DIR}/provider \
+       	--home ${H}/provider \
        	--chain-id provider \
 	-y -b block
 
 sleep 13
 
-interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/provider
-interchain-security-cd q tendermint-validator-set --home ${HOME_DIR}/consumer
+interchain-security-pd q tendermint-validator-set --home ${H}/provider
+interchain-security-cd q tendermint-validator-set --home ${H}/consumer
