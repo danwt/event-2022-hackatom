@@ -8,6 +8,15 @@ STAKE="100000000stake"
 # Node IP address
 NODE_IP="127.0.0.1"
 
+PADDR="${NODE_IP}:26655"
+PRPCLADDR="${NODE_IP}:26658"
+PGRPCADDR="${NODE_IP}:9091"
+PP2PLADDR="${NODE_IP}:26656"
+CADDR="${NODE_IP}:26645"
+CRPCLADDR="${NODE_IP}:26648"
+CGRPCADDR="${NODE_IP}:9081"
+CP2PLADDR="${NODE_IP}:26646"
+
 # Home directory
 H="."
 
@@ -72,7 +81,7 @@ sleep 1
 
 # config tendermint
 
-dasel put string -f ${H}/provider/config/client.toml node "tcp://${NODE_IP}:26658"
+dasel put string -f ${H}/provider/config/client.toml node "tcp://${PRPCLADDR}"
 dasel put string -f ${H}/provider/config/config.toml consensus.timeout_commit 3s
 dasel put string -f ${H}/provider/config/config.toml consensus.timeout_propose 1s
 
@@ -87,10 +96,10 @@ dasel put bool -f ${H}/provider/config/app.toml .api.enabled-unsafe-cors true
 # Start chain (gaia equivalent)
 $PBIN start\
     --home ${H}/provider\
-    --rpc.laddr tcp://${NODE_IP}:26658\
-    --grpc.address $NODE_IP:9091\
-    --address tcp://${NODE_IP}:26655\
-    --p2p.laddr tcp://${NODE_IP}:26656\
+    --address tcp://${PADDR}\
+    --rpc.laddr tcp://${PRPCLADDR}\
+    --grpc.address ${PGRPCADDR}\
+    --p2p.laddr tcp://${PP2PLADDR}\
     &> ${H}/provider/logs &
 
 sleep 5
@@ -111,14 +120,16 @@ tee ${H}/consumer-proposal.json<<EOF
 }
 EOF
 
-$PBIN keys show fizz --keyring-backend test --home ${H}/provider
+$PBIN keys show fizz\
+    --home ${H}/provider\
+    --keyring-backend test
 
 # Submit consumer chain proposal
 $PBIN tx gov submit-proposal create-consumer-chain ${H}/consumer-proposal.json\
-    --chain-id provider\
-    --from fizz\
-    --home ${H}/provider\
     --node tcp://${NODE_IP}:26658\
+    --from fizz\
+    --chain-id provider\
+    --home ${H}/provider\
     --keyring-backend test\
     -b block\
     -y
@@ -130,9 +141,9 @@ $PBIN tx gov vote 1 yes\
     --from fizz\
     --chain-id provider\
     --home ${H}/provider\
+    --keyring-backend test\
     -b block\
-    -y\
-    --keyring-backend test
+    -y
 
 sleep 5
 
@@ -140,8 +151,8 @@ sleep 5
 
 # Build genesis file and node directory structure
 $CBIN init\
-    --chain-id consumer\
     fizz\
+    --chain-id consumer\
     --home ${H}/consumer
 
 sleep 1
@@ -182,13 +193,14 @@ cp ${H}/provider/config/priv_validator_key.json ${H}/consumer/config/priv_valida
 cp ${H}/provider/config/node_key.json ${H}/consumer/config/node_key.json
 
 # Set default client port
-dasel put string -f ${H}/consumer/config/client.toml .node "tcp://${NODE_IP}:26648"
+dasel put string -f ${H}/consumer/config/client.toml .node "tcp://${CRPCLADDR}"
 
-# Start giaia
-$CBIN start --home ${H}/consumer \
-        --rpc.laddr tcp://${NODE_IP}:26648 \
-        --grpc.address ${NODE_IP}:9081 \
-        --address tcp://${NODE_IP}:26645 \
-        --p2p.laddr tcp://${NODE_IP}:26646 \
-        --grpc-web.enable=false \
-        &> ${H}/consumer/logs &
+# Start consumer
+$CBIN start\
+    --home ${H}/consumer \
+    --address tcp://{CADDR} \
+    --rpc.laddr tcp://${CRPCLADDR} \
+    --grpc.address ${CGRPCADDR} \
+    --p2p.laddr tcp://${CP2PLADDR} \
+    --grpc-web.enable=false \
+    &> ${H}/consumer/logs &
