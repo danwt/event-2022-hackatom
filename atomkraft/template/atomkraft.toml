@@ -1,8 +1,0 @@
-[chain]
-binary = "gaia"
-
-[modelator.apalache]
-jar = "/path/to/apalache/jar"
-
-[tests]
-lightweight = ["authz", "cosmwasm"]

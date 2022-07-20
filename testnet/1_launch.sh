@@ -54,9 +54,10 @@ dasel put string -f ${HOME_DIR}/provider/config/config.toml consensus.timeout_pr
 dasel put bool -f ${HOME_DIR}/provider/config/app.toml .api.enable true
 dasel put bool -f ${HOME_DIR}/provider/config/app.toml .api.enabled-unsafe-cors true
 
+# TODO: make sure api settings not overwritten
 # Start gaia
 interchain-security-pd start --home ${HOME_DIR}/provider --rpc.laddr tcp://${NODE_IP}:26658 --grpc.address $NODE_IP:9091 \
- --address tcp://${NODE_IP}:26655 --p2p.laddr tcp://${NODE_IP}:26656 --grpc-web.enable=false &> ${HOME_DIR}/provider/logs &
+ --address tcp://${NODE_IP}:26655 --p2p.laddr tcp://${NODE_IP}:26656 &> ${HOME_DIR}/provider/logs &
 
 sleep 5
 

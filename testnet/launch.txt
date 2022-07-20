@@ -1,0 +1,225 @@
+{
+    "title": "Create a chain",
+    "description": "Gonna be a great chain",
+    "chain_id": "consumer",
+    "initial_height": {
+        "revision_height": 1
+    },
+    "genesis_hash": "Z2VuX2hhc2g=",
+    "binary_hash": "YmluX2hhc2g=",
+    "spawn_time": "2022-03-11T09:02:14.718477-08:00",
+    "deposit": "10000001stake"
+}
+- name: fizz
+  type: local
+  address: cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"Asb+7mxiya5F8GzlJeNeQ0MjHVBgLwaXnLzDEasqi1Rc"}'
+  mnemonic: ""
+
+code: 0
+codespace: ""
+data: 0A2B0A252F636F736D6F732E676F762E763162657461312E4D73675375626D697450726F706F73616C12020801
+events:
+- attributes:
+  - index: true
+    key: ZmVl
+    value: ""
+  type: tx
+- attributes:
+  - index: true
+    key: YWNjX3NlcQ==
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFrLzE=
+  type: tx
+- attributes:
+  - index: true
+    key: c2lnbmF0dXJl
+    value: RnZOSjFPRTJNdGZ4ZEd6UVlqd1RUNG1IQW5LMlhnK0pXVUhtd0w4c29RRnZFSVp0VlFGb0l3cFZtdXZ5NG1CU0UvRDc3U2pqaTF5TVU3a2l0WldwSUE9PQ==
+  type: tx
+- attributes:
+  - index: true
+    key: YWN0aW9u
+    value: L2Nvc21vcy5nb3YudjFiZXRhMS5Nc2dTdWJtaXRQcm9wb3NhbA==
+  type: message
+- attributes:
+  - index: true
+    key: cHJvcG9zYWxfaWQ=
+    value: MQ==
+  type: submit_proposal
+- attributes:
+  - index: true
+    key: c3BlbmRlcg==
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFr
+  - index: true
+    key: YW1vdW50
+    value: MTAwMDAwMDFzdGFrZQ==
+  type: coin_spent
+- attributes:
+  - index: true
+    key: cmVjZWl2ZXI=
+    value: Y29zbW9zMTBkMDd5MjY1Z21tdXZ0NHowdzlhdzg4MGpuc3I3MDBqNnpuOWtu
+  - index: true
+    key: YW1vdW50
+    value: MTAwMDAwMDFzdGFrZQ==
+  type: coin_received
+- attributes:
+  - index: true
+    key: cmVjaXBpZW50
+    value: Y29zbW9zMTBkMDd5MjY1Z21tdXZ0NHowdzlhdzg4MGpuc3I3MDBqNnpuOWtu
+  - index: true
+    key: c2VuZGVy
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFr
+  - index: true
+    key: YW1vdW50
+    value: MTAwMDAwMDFzdGFrZQ==
+  type: transfer
+- attributes:
+  - index: true
+    key: c2VuZGVy
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFr
+  type: message
+- attributes:
+  - index: true
+    key: YW1vdW50
+    value: MTAwMDAwMDFzdGFrZQ==
+  - index: true
+    key: cHJvcG9zYWxfaWQ=
+    value: MQ==
+  type: proposal_deposit
+- attributes:
+  - index: true
+    key: bW9kdWxl
+    value: Z292ZXJuYW5jZQ==
+  - index: true
+    key: c2VuZGVy
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFr
+  type: message
+- attributes:
+  - index: true
+    key: cHJvcG9zYWxfdHlwZQ==
+    value: Q3JlYXRlQ29uc3VtZXJDaGFpbg==
+  - index: true
+    key: dm90aW5nX3BlcmlvZF9zdGFydA==
+    value: MQ==
+  type: submit_proposal
+gas_used: "165868"
+gas_wanted: "200000"
+height: "2"
+info: ""
+logs:
+- events:
+  - attributes:
+    - key: receiver
+      value: cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn
+    - key: amount
+      value: 10000001stake
+    type: coin_received
+  - attributes:
+    - key: spender
+      value: cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak
+    - key: amount
+      value: 10000001stake
+    type: coin_spent
+  - attributes:
+    - key: action
+      value: /cosmos.gov.v1beta1.MsgSubmitProposal
+    - key: sender
+      value: cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak
+    - key: module
+      value: governance
+    - key: sender
+      value: cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak
+    type: message
+  - attributes:
+    - key: amount
+      value: 10000001stake
+    - key: proposal_id
+      value: "1"
+    type: proposal_deposit
+  - attributes:
+    - key: proposal_id
+      value: "1"
+    - key: proposal_type
+      value: CreateConsumerChain
+    - key: voting_period_start
+      value: "1"
+    type: submit_proposal
+  - attributes:
+    - key: recipient
+      value: cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn
+    - key: sender
+      value: cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak
+    - key: amount
+      value: 10000001stake
+    type: transfer
+  log: ""
+  msg_index: 0
+raw_log: '[{"events":[{"type":"coin_received","attributes":[{"key":"receiver","value":"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"},{"key":"amount","value":"10000001stake"}]},{"type":"coin_spent","attributes":[{"key":"spender","value":"cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak"},{"key":"amount","value":"10000001stake"}]},{"type":"message","attributes":[{"key":"action","value":"/cosmos.gov.v1beta1.MsgSubmitProposal"},{"key":"sender","value":"cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak"},{"key":"module","value":"governance"},{"key":"sender","value":"cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak"}]},{"type":"proposal_deposit","attributes":[{"key":"amount","value":"10000001stake"},{"key":"proposal_id","value":"1"}]},{"type":"submit_proposal","attributes":[{"key":"proposal_id","value":"1"},{"key":"proposal_type","value":"CreateConsumerChain"},{"key":"voting_period_start","value":"1"}]},{"type":"transfer","attributes":[{"key":"recipient","value":"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"},{"key":"sender","value":"cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak"},{"key":"amount","value":"10000001stake"}]}]}]'
+timestamp: ""
+tx: null
+txhash: DA9FA1663E14155E175842645737356979495B00A40476FD3D7BA2E32C4B8BE0
+code: 0
+codespace: ""
+data: 0A1D0A1B2F636F736D6F732E676F762E763162657461312E4D7367566F7465
+events:
+- attributes:
+  - index: true
+    key: ZmVl
+    value: ""
+  type: tx
+- attributes:
+  - index: true
+    key: YWNjX3NlcQ==
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFrLzI=
+  type: tx
+- attributes:
+  - index: true
+    key: c2lnbmF0dXJl
+    value: YzFQY0lFWHRZVzZMQVQvKyt5c3hXYWJCY3ZoaTBXSnNXT2h3Tm1vSEN0eFJ6bHhiMlRXNjNreWJqV0VqcUNOKzA5RmRQYnV3NEVEU3pOYzMvS3dpckE9PQ==
+  type: tx
+- attributes:
+  - index: true
+    key: YWN0aW9u
+    value: L2Nvc21vcy5nb3YudjFiZXRhMS5Nc2dWb3Rl
+  type: message
+- attributes:
+  - index: true
+    key: b3B0aW9u
+    value: eyJvcHRpb24iOjEsIndlaWdodCI6IjEuMDAwMDAwMDAwMDAwMDAwMDAwIn0=
+  - index: true
+    key: cHJvcG9zYWxfaWQ=
+    value: MQ==
+  type: proposal_vote
+- attributes:
+  - index: true
+    key: bW9kdWxl
+    value: Z292ZXJuYW5jZQ==
+  - index: true
+    key: c2VuZGVy
+    value: Y29zbW9zMTd1bDJxeHc2cWhmbXFrOTl0Z2o0YzZmcnpyM2VsYWU3c2wzcmFr
+  type: message
+gas_used: "47031"
+gas_wanted: "200000"
+height: "3"
+info: ""
+logs:
+- events:
+  - attributes:
+    - key: action
+      value: /cosmos.gov.v1beta1.MsgVote
+    - key: module
+      value: governance
+    - key: sender
+      value: cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak
+    type: message
+  - attributes:
+    - key: option
+      value: '{"option":1,"weight":"1.000000000000000000"}'
+    - key: proposal_id
+      value: "1"
+    type: proposal_vote
+  log: ""
+  msg_index: 0
+raw_log: '[{"events":[{"type":"message","attributes":[{"key":"action","value":"/cosmos.gov.v1beta1.MsgVote"},{"key":"module","value":"governance"},{"key":"sender","value":"cosmos17ul2qxw6qhfmqk99tgj4c6frzr3elae7sl3rak"}]},{"type":"proposal_vote","attributes":[{"key":"option","value":"{\"option\":1,\"weight\":\"1.000000000000000000\"}"},{"key":"proposal_id","value":"1"}]}]}]'
+timestamp: ""
+tx: null
+txhash: 36A824360E331935FFCABA04D16BA95F1732C1BD8BCB0C1900BD4871AD24515E
