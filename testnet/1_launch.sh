@@ -12,11 +12,12 @@ NODE_IP="127.0.0.1"
 H="."
 
 PBIN=interchain-security-pd
+CBIN=interchain-security-cd
 
 # Clean start
 killall hermes 2> /dev/null || true
 killall $PBIN &> /dev/null || true
-killall interchain-security-cd &> /dev/null || true
+killall $CBIN &> /dev/null || true
 rm -rf ${H}/provider
 rm -rf ${H}/consumer
 rm -f consumer-proposal.json
@@ -27,9 +28,9 @@ rm -f fizz_keypair.json
 $PBIN init --chain-id provider fizz --home ${H}/provider
 
 jq ".app_state.gov.voting_params.voting_period = \"3s\"" \
-   ${H}/provider/config/genesis.json > \
-   ${H}/provider/edited_genesis.json && \
-   mv ${H}/provider/edited_genesis.json ${H}/provider/config/genesis.json
+    ${H}/provider/config/genesis.json > \
+    ${H}/provider/edited_genesis.json && \
+    mv ${H}/provider/edited_genesis.json ${H}/provider/config/genesis.json
 
 sleep 1
 
@@ -114,51 +115,68 @@ $PBIN keys show fizz --keyring-backend test --home ${H}/provider
 
 # Submit consumer chain proposal
 $PBIN tx gov submit-proposal create-consumer-chain ${H}/consumer-proposal.json\
- --chain-id provider\
- --from fizz\
- --home ${H}/provider\
- --node tcp://${NODE_IP}:26658\
- --keyring-backend test\
- -b block\
- -y
+    --chain-id provider\
+    --from fizz\
+    --home ${H}/provider\
+    --node tcp://${NODE_IP}:26658\
+    --keyring-backend test\
+    -b block\
+    -y
 
 sleep 1
 
 # Vote yes to proposal
 $PBIN tx gov vote 1 yes\
- --from fizz\
- --chain-id provider\
- --home ${H}/provider\
- -b block\
- -y\
- --keyring-backend test
+    --from fizz\
+    --chain-id provider\
+    --home ${H}/provider\
+    -b block\
+    -y\
+    --keyring-backend test
 
 sleep 5
 
 ## CONSUMER CHAIN ##
 
 # Build genesis file and node directory structure
-interchain-security-cd init --chain-id consumer fizz --home ${H}/consumer
+$CBIN init\
+    --chain-id consumer\
+    fizz\
+    --home ${H}/consumer
 
 sleep 1
 
 # Create user account keypair
-interchain-security-cd keys add fizz --home ${H}/consumer\
+$CBIN keys add fizz\
+    --home ${H}/consumer\
     --keyring-backend\
     test --output json\
     > ${H}/fizz_cons_keypair.json 2>&1
 
 # Add stake to user account
-interchain-security-cd add-genesis-account $(jq -r .address fizz_cons_keypair.json)  1000000000stake --home ${H}/consumer
+$CBIN add-genesis-account\
+    $(jq -r .address fizz_cons_keypair.json)\
+    1000000000stake\
+    --home ${H}/consumer
 
 # Add consumer genesis states to genesis file
-$PBIN query provider consumer-genesis consumer --home ${H}/provider -o json > ${H}/consumer_gen.json
-jq -s '.[0].app_state.ccvconsumer = .[1] | .[0]' ${H}/consumer/config/genesis.json ${H}/consumer_gen.json > ${H}/consumer/edited_genesis.json && mv ${H}/consumer/edited_genesis.json ${H}/consumer/config/genesis.json
+$PBIN query provider consumer-genesis consumer\
+    --home ${H}/provider\
+    -o json > ${H}/consumer_gen.json
+
+jq -s '.[0].app_state.ccvconsumer = .[1] | .[0]'\
+    ${H}/consumer/config/genesis.json ${H}/consumer_gen.json\
+    > ${H}/consumer/edited_genesis.json\
+    && mv ${H}/consumer/edited_genesis.json ${H}/consumer/config/genesis.json
+
 rm ${H}/consumer_gen.json
 
-jq ".app_state.gov.voting_params.voting_period = \"3s\" | .app_state.staking.params.unbonding_time = \"600s\"" \
-	   ${H}/consumer/config/genesis.json > \
-	   ${H}/consumer/edited_genesis.json && mv ${H}/consumer/edited_genesis.json ${H}/consumer/config/genesis.json
+dasel put string -f ${H}/consumer/config/genesis.json .app_state.gov.voting_params.voting_period 3s
+dasel put string -f ${H}/consumer/config/genesis.json .app_state.staking.params.unbonding_time 600s
+jq ".app_state.gov.voting_params.voting_period = \"3s\" | .app_state.staking.params.unbonding_time = \"600s\""\
+    ${H}/consumer/config/genesis.json\
+    > ${H}/consumer/edited_genesis.json\
+    && mv ${H}/consumer/edited_genesis.json ${H}/consumer/config/genesis.json
 
 # Create validator states
 echo '{"height": "0","round": 0,"step": 0}' > ${H}/consumer/data/priv_validator_state.json
@@ -171,7 +189,7 @@ cp ${H}/provider/config/node_key.json ${H}/consumer/config/node_key.json
 sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${NODE_IP}:26648\"/" ${H}/consumer/config/client.toml
 
 # Start giaia
-interchain-security-cd start --home ${H}/consumer \
+$CBIN start --home ${H}/consumer \
         --rpc.laddr tcp://${NODE_IP}:26648 \
         --grpc.address ${NODE_IP}:9081 \
         --address tcp://${NODE_IP}:26645 \
