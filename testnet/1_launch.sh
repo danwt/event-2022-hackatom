@@ -6,7 +6,7 @@ USER_COINS="100000000000stake"
 # Amount of stake tokens staked
 STAKE="100000000stake"
 # Node IP address
-NODE_IP="127.0.0.1"
+NODE_IP="localhost"
 
 PADDR="${NODE_IP}:26655"
 PRPCLADDR="${NODE_IP}:26658"
@@ -32,6 +32,7 @@ rm -rf ${H}/consumer
 rm -f consumer-proposal.json
 rm -f fizz_cons_keypair.json
 rm -f fizz_keypair.json
+rm -f hermeslog
 
 # Build genesis file and node directory structure
 $PBIN init --chain-id provider fizz --home ${H}/provider
@@ -90,7 +91,7 @@ dasel put string -f ${H}/provider/config/config.toml consensus.timeout_propose 1
 dasel put bool -f ${H}/provider/config/app.toml .api.enable true
 dasel put bool -f ${H}/provider/config/app.toml .api.swagger true
 dasel put bool -f ${H}/provider/config/app.toml .api.enabled-unsafe-cors true
-# dasel put string -f ${H}/provider/config/app.toml .api.address "tcp:://${NODE_IP}:1317"
+# dasel put string -f ${H}/provider/config/app.toml .api.address "tcp:://${PADDR}"
 # dasel put string -f ${H}/provider/config/app.toml .grpc.address "${NODE_IP}:9091"
 
 # Start chain (gaia equivalent)
@@ -100,6 +101,7 @@ $PBIN start\
     --rpc.laddr tcp://${PRPCLADDR}\
     --grpc.address ${PGRPCADDR}\
     --p2p.laddr tcp://${PP2PLADDR}\
+    --grpc-web.enable=false\
     &> ${H}/provider/logs &
 
 sleep 5
@@ -194,11 +196,15 @@ cp ${H}/provider/config/node_key.json ${H}/consumer/config/node_key.json
 
 # Set default client port
 dasel put string -f ${H}/consumer/config/client.toml .node "tcp://${CRPCLADDR}"
+dasel put string -f ${H}/consumer/config/app.toml .api.address "tcp://0.0.0.0:1318"
+dasel put bool -f ${H}/consumer/config/app.toml .api.enable true
+dasel put bool -f ${H}/consumer/config/app.toml .api.swagger true
+dasel put bool -f ${H}/consumer/config/app.toml .api.enabled-unsafe-cors true
 
 # Start consumer
 $CBIN start\
     --home ${H}/consumer \
-    --address tcp://{CADDR} \
+    --address tcp://${CADDR} \
     --rpc.laddr tcp://${CRPCLADDR} \
     --grpc.address ${CGRPCADDR} \
     --p2p.laddr tcp://${CP2PLADDR} \

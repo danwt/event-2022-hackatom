@@ -2,12 +2,26 @@
 set -eux 
 
 # Node IP address
-NODE_IP="127.0.0.1"
+NODE_IP="localhost"
+
+PADDR="${NODE_IP}:26655"
+PRPCLADDR="${NODE_IP}:26658"
+PGRPCADDR="${NODE_IP}:9091"
+PP2PLADDR="${NODE_IP}:26656"
+CADDR="${NODE_IP}:26645"
+CRPCLADDR="${NODE_IP}:26648"
+CGRPCADDR="${NODE_IP}:9081"
+CP2PLADDR="${NODE_IP}:26646"
 
 # Home directory
 H="."
 
-# Setup Hermes in packet relayer mode
+PBIN=interchain-security-pd
+CBIN=interchain-security-cd
+
+killall hermes 2> /dev/null || true
+
+# Setup Hermes in packet relayer mode (warning: trusting period may need to be modified)
 
 tee ~/.hermes/config.toml<<EOF
 [global]
@@ -33,15 +47,15 @@ enabled = true
 account_prefix = "cosmos"
 clock_drift = "5s"
 gas_multiplier = 1.1
-grpc_addr = "tcp://${NODE_IP}:9081"
+grpc_addr = "tcp://${CGRPCADDR}"
 id = "consumer"
 key_name = "relayer"
 max_gas = 2000000
-rpc_addr = "http://${NODE_IP}:26648"
+rpc_addr = "http://${CRPCLADDR}"
 rpc_timeout = "10s"
 store_prefix = "ibc"
 trusting_period = "14days"
-websocket_addr = "ws://${NODE_IP}:26648/websocket"
+websocket_addr = "ws://${CRPCLADDR}/websocket"
 
 [chains.gas_price]
        denom = "stake"
@@ -55,15 +69,15 @@ websocket_addr = "ws://${NODE_IP}:26648/websocket"
 account_prefix = "cosmos"
 clock_drift = "5s"
 gas_multiplier = 1.1
-grpc_addr = "tcp://${NODE_IP}:9091"
+grpc_addr = "tcp://${PGRPCADDR}"
 id = "provider"
 key_name = "relayer"
 max_gas = 2000000
-rpc_addr = "http://${NODE_IP}:26658"
+rpc_addr = "http://${PRPCLADDR}"
 rpc_timeout = "10s"
 store_prefix = "ibc"
 trusting_period = "14days"
-websocket_addr = "ws://${NODE_IP}:26658/websocket"
+websocket_addr = "ws://${PRPCLADDR}/websocket"
 
 [chains.gas_price]
        denom = "stake"
@@ -85,17 +99,27 @@ hermes keys add --key-file fizz_keypair.json --chain provider
 
 sleep 5
 
-hermes create connection --a-chain consumer --a-client 07-tendermint-0 --b-client 07-tendermint-0
-hermes create channel --a-chain consumer --a-port consumer --b-port provider --order ordered --channel-version 1 --a-connection connection-0
+hermes create connection\
+    --a-chain consumer\
+    --a-client 07-tendermint-0\
+    --b-client 07-tendermint-0
+
+hermes create channel\
+    --a-chain consumer\
+    --a-port consumer\
+    --b-port provider\
+    --order ordered\
+    --channel-version 1\
+    --a-connection connection-0
 
 sleep 5
 
-hermes -j start &> ~/.hermes/logs &
+hermes --json start &> ${H}/hermeslog &
 
-interchain-security-pd q tendermint-validator-set --home ${H}/provider
-interchain-security-cd q tendermint-validator-set --home ${H}/consumer
+$PBIN q tendermint-validator-set --home ${H}/provider
+$CBIN q tendermint-validator-set --home ${H}/consumer
 
-DELEGATIONS=$(interchain-security-pd q staking delegations \
+DELEGATIONS=$($PBIN q staking delegations \
 	$(jq -r .address fizz_keypair.json) \
 	--home ${H}/provider -o json)
 
@@ -103,14 +127,14 @@ echo $DELEGATIONS
 
 OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.validator_address)
 
-interchain-security-pd tx staking delegate $OPERATOR_ADDR 1000000stake \
-       	--from fizz \
-       	--keyring-backend test \
-       	--home ${H}/provider \
-       	--chain-id provider \
-	-y -b block
+$PBIN tx staking delegate $OPERATOR_ADDR 1000000stake \
+    --from fizz \
+    --chain-id provider \
+    --home ${H}/provider \
+    --keyring-backend test \
+    -y -b block
 
 sleep 13
 
-interchain-security-pd q tendermint-validator-set --home ${H}/provider
-interchain-security-cd q tendermint-validator-set --home ${H}/consumer
+$PBIN q tendermint-validator-set --home ${H}/provider
+$CBIN q tendermint-validator-set --home ${H}/consumer
