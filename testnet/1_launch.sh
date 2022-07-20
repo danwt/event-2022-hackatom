@@ -19,11 +19,11 @@ rm -rf ${HOME_DIR}/provider
 killall interchain-security-cd &> /dev/null || true
 rm -rf ${HOME_DIR}/consumer
 rm -f consumer-proposal.json
-rm -f simon_cons_keypair.json
-rm -f simon_keypair.json
+rm -f fizz_cons_keypair.json
+rm -f fizz_keypair.json
 
 # Build genesis file and node directory structure
-interchain-security-pd init --chain-id provider simon --home ${HOME_DIR}/provider
+interchain-security-pd init --chain-id provider fizz --home ${HOME_DIR}/provider
 
 jq ".app_state.gov.voting_params.voting_period = \"3s\"" \
    ${HOME_DIR}/provider/config/genesis.json > \
@@ -34,15 +34,15 @@ sleep 1
 #  | .app_state.staking.params.unbonding_time = \"600s\"
 
 # Create account keypair
-interchain-security-pd keys add simon --home ${HOME_DIR}/provider --keyring-backend test --output json > simon_keypair.json 2>&1
+interchain-security-pd keys add fizz --home ${HOME_DIR}/provider --keyring-backend test --output json > fizz_keypair.json 2>&1
 sleep 1
 
 # Add stake to user
-interchain-security-pd add-genesis-account $(jq -r .address simon_keypair.json) $USER_COINS --home ${HOME_DIR}/provider --keyring-backend test
+interchain-security-pd add-genesis-account $(jq -r .address fizz_keypair.json) $USER_COINS --home ${HOME_DIR}/provider --keyring-backend test
 sleep 1
 
 # Stake 1/1000 user's coins
-interchain-security-pd gentx simon $STAKE --chain-id provider --home ${HOME_DIR}/provider --keyring-backend test --moniker simon
+interchain-security-pd gentx fizz $STAKE --chain-id provider --home ${HOME_DIR}/provider --keyring-backend test --moniker fizz
 sleep 1
 
 interchain-security-pd collect-gentxs --home ${HOME_DIR}/provider --gentx-dir ${HOME_DIR}/provider/config/gentx/
@@ -76,29 +76,29 @@ tee ${HOME_DIR}/consumer-proposal.json<<EOF
 }
 EOF
 
-interchain-security-pd keys show simon --keyring-backend test --home ${HOME_DIR}/provider
+interchain-security-pd keys show fizz --keyring-backend test --home ${HOME_DIR}/provider
 
 
 # Submit consumer chain proposal
-interchain-security-pd tx gov submit-proposal create-consumer-chain ${HOME_DIR}/consumer-proposal.json --chain-id provider --from simon --home ${HOME_DIR}/provider --node tcp://${NODE_IP}:26658  --keyring-backend test -b block -y
+interchain-security-pd tx gov submit-proposal create-consumer-chain ${HOME_DIR}/consumer-proposal.json --chain-id provider --from fizz --home ${HOME_DIR}/provider --node tcp://${NODE_IP}:26658  --keyring-backend test -b block -y
 
 sleep 1
 
 # Vote yes to proposal
-interchain-security-pd tx gov vote 1 yes --from simon --chain-id provider --home ${HOME_DIR}/provider -b block -y --keyring-backend test
+interchain-security-pd tx gov vote 1 yes --from fizz --chain-id provider --home ${HOME_DIR}/provider -b block -y --keyring-backend test
 sleep 5
 
 ## CONSUMER CHAIN ##
 
 # Build genesis file and node directory structure
-interchain-security-cd init --chain-id consumer simon --home ${HOME_DIR}/consumer
+interchain-security-cd init --chain-id consumer fizz --home ${HOME_DIR}/consumer
 sleep 1
 
 # Create user account keypair
-interchain-security-cd keys add simon --home ${HOME_DIR}/consumer --keyring-backend test --output json > ${HOME_DIR}/simon_cons_keypair.json 2>&1
+interchain-security-cd keys add fizz --home ${HOME_DIR}/consumer --keyring-backend test --output json > ${HOME_DIR}/fizz_cons_keypair.json 2>&1
 
 # Add stake to user account
-interchain-security-cd add-genesis-account $(jq -r .address simon_cons_keypair.json)  1000000000stake --home ${HOME_DIR}/consumer
+interchain-security-cd add-genesis-account $(jq -r .address fizz_cons_keypair.json)  1000000000stake --home ${HOME_DIR}/consumer
 
 # Add consumer genesis states to genesis file
 interchain-security-pd query provider consumer-genesis consumer --home ${HOME_DIR}/provider -o json > ${HOME_DIR}/consumer_gen.json

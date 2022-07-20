@@ -84,8 +84,8 @@ hermes keys delete --chain provider --all
 
 # Restore keys to hermes relayer
 # TODO: think I might need to use --mnemonic-file here
-hermes keys add --key-file simon_cons_keypair.json --chain consumer
-hermes keys add --key-file simon_keypair.json --chain provider
+hermes keys add --key-file fizz_cons_keypair.json --chain consumer
+hermes keys add --key-file fizz_keypair.json --chain provider
 
 sleep 5
 
@@ -100,7 +100,7 @@ interchain-security-pd q tendermint-validator-set --home ${HOME_DIR}/provider
 interchain-security-cd q tendermint-validator-set --home ${HOME_DIR}/consumer
 
 DELEGATIONS=$(interchain-security-pd q staking delegations \
-	$(jq -r .address simon_keypair.json) \
+	$(jq -r .address fizz_keypair.json) \
 	--home ${HOME_DIR}/provider -o json)
 
 echo $DELEGATIONS
@@ -108,7 +108,7 @@ echo $DELEGATIONS
 OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.validator_address)
 
 interchain-security-pd tx staking delegate $OPERATOR_ADDR 1000000stake \
-       	--from simon \
+       	--from fizz \
        	--keyring-backend test \
        	--home ${HOME_DIR}/provider \
        	--chain-id provider \
