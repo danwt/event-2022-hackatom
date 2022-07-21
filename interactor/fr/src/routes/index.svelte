@@ -21,23 +21,40 @@
 			});
 	}
 
-	function kill() {
-		post({ kind: 'kill' });
-	}
-
-	function launch() {
-		console.log(`launch`);
-	}
-
 	const buttons = [
 		{
-			label: 'kill',
-			fn: kill,
+			label: 'helloWorld',
+			fn: () => {
+				post({ kind: 'helloWorld' });
+			},
+			loading: false
+		},
+		{
+			label: 'preconditions',
+			fn: () => {
+				post({ kind: 'preconditions' });
+			},
+			loading: false
+		},
+		{
+			label: 'killAndClean',
+			fn: () => {
+				post({ kind: 'killAndClean' });
+			},
 			loading: false
 		},
 		{
 			label: 'launch',
-			fn: launch,
+			fn: () => {
+				post({ kind: 'launch' });
+			},
+			loading: false
+		},
+		{
+			label: 'relay',
+			fn: () => {
+				post({ kind: 'relay' });
+			},
 			loading: false
 		}
 	];
@@ -52,7 +69,7 @@
 	<div class="btn-group btn-group-vertical">
 		{#each buttons as b, i (i)}
 			<button
-				class="btn {b.loading ? 'loading' : ''}"
+				class="btn btn-wide btn-primary {b.loading ? 'loading' : ''}"
 				on:click={_.debounce(
 					() => {
 						b.loading = true;

@@ -1,3 +1,3 @@
 touch dummyFileFromDummyScript
-echo "the dummy script has been run"
+echo "0_helloWorld.sh successfully run."
 rm dummyFileFromDummyScript
