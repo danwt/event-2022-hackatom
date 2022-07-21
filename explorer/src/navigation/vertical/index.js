@@ -102,6 +102,11 @@ function processMenu() {
     href: 'https://github.com/cosmos/ibc/tree/marius/ccv/spec/app/ics-028-cross-chain-validation',
     icon: 'GithubIcon',
   })
+  chainMenus.push({
+    title: 'Consumer Chain Tool',
+    href: 'https://github.com/Ethernal-Tech/consumer-chain-tool',
+    icon: 'GithubIcon',
+  })
 
   return chainMenus
 }
