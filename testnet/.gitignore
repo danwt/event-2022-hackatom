@@ -1,4 +1,5 @@
 *.json
 consumer/
 provider/
+hermeslog
 .DS_Store

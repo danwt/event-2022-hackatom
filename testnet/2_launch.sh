@@ -82,8 +82,6 @@ dasel put string -f ${H}/provider/config/config.toml consensus.timeout_propose 1
 dasel put bool -f ${H}/provider/config/app.toml .api.enable true
 dasel put bool -f ${H}/provider/config/app.toml .api.swagger true
 dasel put bool -f ${H}/provider/config/app.toml .api.enabled-unsafe-cors true
-# dasel put string -f ${H}/provider/config/app.toml .api.address "tcp:://${PADDR}"
-# dasel put string -f ${H}/provider/config/app.toml .grpc.address "${NODE_IP}:9091"
 
 # Start chain (gaia equivalent)
 $PBIN start\
@@ -186,6 +184,7 @@ cp ${H}/provider/config/priv_validator_key.json ${H}/consumer/config/priv_valida
 cp ${H}/provider/config/node_key.json ${H}/consumer/config/node_key.json
 
 # Set default client port
+dasel put string -f ${H}/consumer/config/config.toml .rpc.laddr "tcp://127.0.0.1:26647"
 dasel put string -f ${H}/consumer/config/client.toml .node "tcp://${CRPCLADDR}"
 dasel put string -f ${H}/consumer/config/app.toml .api.address "tcp://0.0.0.0:1318"
 dasel put bool -f ${H}/consumer/config/app.toml .api.enable true

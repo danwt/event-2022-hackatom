@@ -1,0 +1,24 @@
+{
+    "chain_name": "provider",
+    "api": [
+        "http://0.0.0.0:1317"
+    ],
+    "rpc": [
+        "tcp://localhost:26657"
+    ],
+    "snapshot_provider": "",
+    "sdk_version": "0.45.2",
+    "coin_type": "118",
+    "min_tx_fee": "800",
+    "addr_prefix": "cosmos",
+    "logo": "/logos/cosmos.svg",
+    "assets": [
+        {
+            "base": "stake",
+            "symbol": "STAKE",
+            "exponent": "6",
+            "coingecko_id": "cosmos",
+            "logo": "/logos/cosmos.svg"
+        }
+    ]
+}
