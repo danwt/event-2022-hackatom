@@ -3,3 +3,5 @@ consumer/
 provider/
 hermeslog
 .DS_Store
+execa.json
+execa.all.txt

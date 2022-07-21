@@ -2,18 +2,26 @@ import express from 'express';
 import cors from 'cors';
 const app = express();
 import { execa } from 'execa';
+import * as fs from 'fs'
 app.use(cors());
 app.use(express.json());
+
+const CWD = "/Users/danwt/Documents/work/hackatom/testnet"
 
 async function doCmd(cmd: string) {
   let res = undefined
   try {
     res = await execa(cmd, [], {
-      cwd: "/Users/danwt/Documents/work/hackatom/testnet",
-      all: true
+      cwd: CWD,
+      all: true,
+      shell: true
     });
   } catch (error) {
     console.log(error);
+    console.log(`doCmd errored`);
+    fs.writeFileSync(CWD + "/execa.json", JSON.stringify(error))
+    fs.writeFileSync(CWD + "/execa.all.txt", error.all)
+    return
     /*
     {
       message: 'Command failed with ENOENT: unknown command spawn unknown ENOENT',
@@ -37,6 +45,7 @@ async function doCmd(cmd: string) {
     */
   }
   console.log(res);
+  console.log(`doCmd succeeded`);
 }
 
 interface Req {

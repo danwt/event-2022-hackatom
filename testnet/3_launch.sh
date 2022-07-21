@@ -23,7 +23,7 @@ H="."
 PBIN=interchain-security-pd
 CBIN=interchain-security-cd
 
-./1_kill.sh
+./2_killAndClean.sh
 
 # Build genesis file and node directory structure
 $PBIN init --chain-id provider fizz --home ${H}/provider

@@ -23,21 +23,21 @@
 
 	const buttons = [
 		{
-			label: 'helloWorld',
+			label: 'hello world',
 			fn: () => {
 				post({ kind: 'helloWorld' });
 			},
 			loading: false
 		},
 		{
-			label: 'preconditions',
+			label: 'check pre-conditions',
 			fn: () => {
 				post({ kind: 'preconditions' });
 			},
 			loading: false
 		},
 		{
-			label: 'killAndClean',
+			label: 'kill and clean',
 			fn: () => {
 				post({ kind: 'killAndClean' });
 			},
@@ -66,7 +66,7 @@
 </svelte:head>
 
 <div class="artboard phone-1">
-	<div class="btn-group btn-group-vertical">
+	<div class="btn-group btn-group-vertical m-10">
 		{#each buttons as b, i (i)}
 			<button
 				class="btn btn-wide btn-primary {b.loading ? 'loading' : ''}"
