@@ -1,11 +1,39 @@
+#!/bin/bash
+set -eux 
+
+# Amount on genesis
+ACC_AMT="1000000000000stake"
+# Amount to self delegate
+FIZZ_SELF_DELEGATE_AMT="1000000000stake"
+OTHER_SELF_DELEGATE_AMT="90000000stake"
+# Node IP address
+NODE_IP="localhost"
+
+PADDR="${NODE_IP}:26655"
+PRPCLADDR="${NODE_IP}:26658"
+PGRPCADDR="${NODE_IP}:9091"
+PP2PLADDR="${NODE_IP}:26656"
+CADDR="${NODE_IP}:26645"
+CRPCLADDR="${NODE_IP}:26648"
+CGRPCADDR="${NODE_IP}:9081"
+CP2PLADDR="${NODE_IP}:26646"
+
+# Home directory
+H="."
+
+PBIN=interchain-security-pd
+CBIN=interchain-security-cd
+
+HANDLE=$1
+
 ### PROVIDER
 
 # Init new node directory
-$PBIN init --chain-id provider buzz --home ${H}/p
+$PBIN init --chain-id provider $HANDLE --home ${H}/p
 
-# Create a keypair (buzz is key name)
+# Create a keypair ($HANDLE is key name)
 $PBIN keys\
-    add buzz \
+    add $HANDLE \
     --home ${H}/p \
     --keyring-backend test\
     --output json\
@@ -49,7 +77,7 @@ $PBIN q\
 # to another account at least extra `1000000stake` tokens.*
 
 # Get local account addresses
-ACCOUNT_ADDR=$($PBIN keys show buzz \
+ACCOUNT_ADDR=$($PBIN keys show $HANDLE \
        --home /${H}/p --output json | jq '.address')
 
 # Run this command 
@@ -68,8 +96,8 @@ VAL_PUBKEY=$($PBIN tendermint show-validator --home ${H}/p)
 $PBIN tx staking create-validator \
   --amount 1000000stake \
   --pubkey $VAL_PUBKEY \
-  --moniker buzz \
-  --from buzz \
+  --moniker $HANDLE \
+  --from $HANDLE \
   --keyring-backend test \
   --home ${H}/p \
   --chain-id provider \
@@ -89,14 +117,14 @@ rm -rf ${H}/c
 
 # Init new node directory
 $CBIN init\
-    buzz\
+    $HANDLE\
     --chain-id consumer\
     --home ${H}/c
 
 sleep 1
 
 # Create user account keypair (reuse name)
-$CBIN keys add buzz\
+$CBIN keys add $HANDLE\
     --home ${H}/c\
     --keyring-backend test\
     --output json\
