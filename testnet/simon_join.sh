@@ -1,18 +1,15 @@
 
-# Create new node dir
+# Init new node directory
 interchain-securityd init <prov-node-moniker> --chain-id provider --home <prov-node-dir>
 
-# To generate the node account keypair use the following command.
+# Generate a new keypair
 interchain-security-pd keys add <provider-keyname> --home <prov-node-dir> --keyring-backend test --output json > <provider_keyname_keypair>.json 2>&1
 
+# Get the provider genesis file
 curl -o <prov-node-dir>/config/genesis.json https://pastebin.com/<your-pastbin-genesis-dump>
 
-# This command will run the node using the coordinator persistent peer address retrieved from the genesis state. Replace the `<prov-node-dir>` with your your chosen provider node directory.  
-
-# Retrieve public ip address
 MY_IP=$(host -4 myip.opendns.com resolver1.opendns.com | grep "address" | awk '{print $4}')
 
-# Get persistent peer
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' <prov-node-dir>/config/genesis.json)
 
 # Run node
@@ -25,7 +22,8 @@ interchain-securityd start --home <prov-node-dir> \
         --p2p.persistent_peers $COORDINATOR_P2P_ADDRESS \
         &> <prov-node-dir>/logs &
 
-# If you get the error "can't bind address xxx.xxx.x.x", try using `127.0.0.1` instead.*
+# If you get the error "can't bind address xxx.xxx.x.x"
+# try using `127.0.0.1` instead.
 
 # Setup the client RPC endpoint using the following command.
 sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${MY_IP}:26658\"/" <prov-node-dir>/config/client.toml
@@ -64,7 +62,7 @@ interchain-security-pd tx staking create-validator \
             --moniker <prov-node-moniker> \
             --min-self-delegation 1 \
             -b block -y
-            
+
 # Verify that your validator node is now part of the validator-set.
 
 interchain-security-pd q tendermint-validator-set --home <prov-node-dir>
