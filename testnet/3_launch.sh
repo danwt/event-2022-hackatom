@@ -27,6 +27,8 @@ CBIN=interchain-security-cd
 
 ./2_killAndClean.sh
 
+### PROVIDER CHAIN ###
+
 # Build genesis file and node directory structure (fizz is node moniker)
 $PBIN init --chain-id provider fizz --home ${H}/p
 
@@ -96,7 +98,7 @@ $PBIN start\
 sleep 5
 
 # Create consumer chain proposal file
-tee ${H}/c-proposal.json<<EOF
+tee ${H}/proposal.json<<EOF
 {
     "title": "Create a chain",
     "description": "Gonna be a great chain",
@@ -114,7 +116,7 @@ EOF
 # Submit consumer chain proposal (fizz is key name,
 # node is the tendermint rpc endpoint for provider)
 $PBIN tx gov submit-proposal create-consumer-chain\
-    ${H}/c-proposal.json\
+    ${H}/proposal.json\
     --from fizz\
     --node tcp://${PRPCLADDR}\
     --chain-id provider\
@@ -136,7 +138,7 @@ $PBIN tx gov vote 1 yes\
 
 sleep 5
 
-## CONSUMER CHAIN ##
+### CONSUMER CHAIN ###
 
 # Create default genesis file and node directory
 # (fizz is again a moniker here)
@@ -164,15 +166,18 @@ $CBIN add-genesis-account\
 # (provider is module name, consumer is a chain-id)
 $PBIN query provider consumer-genesis consumer\
     --home ${H}/p\
-    -o json > ${H}/genesis_c.json
+    -o json > ${H}/consumer_module_genesis_state.json
 
+# Splice the module state exported by the provider into the consumer genesis
 jq -s '.[0].app_state.ccvconsumer = .[1] | .[0]'\
-    ${H}/c/config/genesis.json ${H}/genesis_c.json\
+    ${H}/c/config/genesis.json ${H}/consumer_module_genesis_state.json\
     > ${H}/c/edited_genesis.json\
     && mv ${H}/c/edited_genesis.json ${H}/c/config/genesis.json
 
-rm ${H}/genesis_c.json
+# Delete module state because no longer needed
+rm ${H}/consumer_module_genesis_state.json
 
+# Update consumer chain params
 dasel put string -f ${H}/c/config/genesis.json .app_state.gov.voting_params.voting_period 3s
 dasel put string -f ${H}/c/config/genesis.json .app_state.staking.params.unbonding_time 600s
 
