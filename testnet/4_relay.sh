@@ -121,4 +121,4 @@ hermes create channel\
 
 sleep 5
 
-hermes --json start &> ${H}/hermes.log
+hermes --json start &> ${H}/hermes.log &

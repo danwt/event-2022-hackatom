@@ -16,7 +16,9 @@ PBIN=interchain-security-pd
 CBIN=interchain-security-cd
 
 # Node IP address
-NODE_IP="127.0.0.2"
+NODE_IP="7.7.7.0"
+
+# ip addr add $NODE_IP dev etho0 || true # allowed to fail
 
 PADDR="${NODE_IP}:26655"
 PRPCLADDR="${NODE_IP}:26658"
@@ -30,7 +32,14 @@ CP2PLADDR="${NODE_IP}:26646"
 # Cleanup
 rm -rf $PDIR
 rm -rf $CDIR
-rm *_${HANDLE}.json
+rm -f *_${HANDLE}.json
+
+$PBIN keys\
+    delete $HANDLE \
+    --home $PDIR \
+    --keyring-backend test\
+    --output json\
+    || true
 
 ### PROVIDER
 
@@ -54,6 +63,10 @@ cp ${H}/p/config/genesis.json $PDIR/config/genesis.json
 
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
 
+echo $COORDINATOR_P2P_ADDRESS
+
+exit 1
+
 # Start the node
 # If you get the error "can't bind address xxx.xxx.x.x"
 # try using `127.0.0.1` instead.
@@ -75,21 +88,20 @@ dasel put string -f $PDIR/config/client.toml node "tcp://${PRPCLADDR}"
 
 # Get fizz account addresses
 # TODO: parameterise
-SRC_ADDR=$($PBIN keys show fizz \
-    --home ${H}/p --output json | jq '.address')
 
-# Get local account addresses to receive tokens
-ACC_ADDR=$($PBIN keys show $HANDLE \
-    --home $PDIR --output json | jq '.address')
+SRC_ADDR=$(dasel --plain -f keypair_p_fizz.json .address)
+DST_ADDR=$(dasel --plain -f keypair_p_buzz.json .address)
 
 # Get some tokens
 $PBIN tx bank send\
-    $SRC_ADDR $ACC_ADDR \
+    $SRC_ADDR $SRC_ADDR \
     1000000stake\
     --from fizz\
-    --home $PDIR\
+    --home ${H}/p \
     --chain-id provider\
-    -b block
+    --keyring-backend test \
+    -b block\
+    -y
 
 sleep 8
 
@@ -116,7 +128,7 @@ sleep 6
 
 # Verify that your validator node is now part of the validator-set.
 
-$PBIN q tendermint-validator-set --home $PDIR
+$PBIN q tendermint-validator-set --home ${H}/p
 
 ### CONSUMER ###
 
@@ -145,6 +157,7 @@ cp ${H}/p/config/priv_validator_key.json $CDIR/config/priv_validator_key.json
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
 
 CONSUMER_P2P_ADDRESS=$(echo $COORDINATOR_P2P_ADDRESS | sed 's/:.*/:26646/')
+
 
 # Start the node
 $CBIN start\
