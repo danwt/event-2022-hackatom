@@ -189,7 +189,6 @@ cp ${H}/p/config/priv_validator_key.json ${H}/c/config/priv_validator_key.json
 cp ${H}/p/config/node_key.json ${H}/c/config/node_key.json
 
 # Set default client port
-dasel put string -f ${H}/c/config/config.toml .rpc.laddr "tcp://127.0.0.1:26647"
 dasel put string -f ${H}/c/config/client.toml .node "tcp://${CRPCLADDR}"
 dasel put string -f ${H}/c/config/app.toml .api.address "tcp://0.0.0.0:1318"
 dasel put bool -f ${H}/c/config/app.toml .api.enable true
