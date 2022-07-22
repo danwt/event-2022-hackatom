@@ -1,7 +1,7 @@
-*.json
-consumer/
-provider/
-hermeslog
 .DS_Store
+*.json
+c/
+p/
+hermes.log
 execa.json
 execa.all.txt

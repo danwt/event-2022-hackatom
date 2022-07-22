@@ -28,7 +28,8 @@ CBIN=interchain-security-cd
 # Build genesis file and node directory structure (fizz is node moniker)
 $PBIN init --chain-id provider fizz --home ${H}/p
 
-dasel put string -f ${H}/p/config/genesis.json .app_state.gov.voting_params.voting_period "3s"
+dasel put string -f ${H}/p/config/genesis.json\
+    .app_state.gov.voting_params.voting_period "3s"
 
 sleep 1
 
@@ -108,10 +109,6 @@ tee ${H}/consumer-proposal.json<<EOF
     "deposit": "10000001stake"
 }
 EOF
-
-$PBIN keys show fizz\
-    --home ${H}/p\
-    --keyring-backend test
 
 # Submit consumer chain proposal
 $PBIN tx gov submit-proposal create-consumer-chain ${H}/consumer-proposal.json\
