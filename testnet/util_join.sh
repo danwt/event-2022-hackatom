@@ -54,9 +54,6 @@ cp ${H}/p/config/genesis.json $PDIR/config/genesis.json
 
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
 
-echo $COORDINATOR_P2P_ADDRESS
-exit 1
-
 # Start the node
 # If you get the error "can't bind address xxx.xxx.x.x"
 # try using `127.0.0.1` instead.
@@ -115,7 +112,7 @@ $PBIN tx staking create-validator \
     -b block\
     -y
 
-sleep 5
+sleep 6
 
 # Verify that your validator node is now part of the validator-set.
 
@@ -138,13 +135,11 @@ $CBIN keys add $HANDLE\
     --output json\
     > ${H}/keypair_c_${HANDLE}.json 2>&1
 
-# Import Consumer chain genesis file__
-#    as explained in the provider chain section point 5 .
-# TODO:???
-
+# Get the provider genesis file
+cp ${H}/p/config/genesis.json $CDIR/config/genesis.json
 # Copy validator keys to consumer directory
-cp $PDIR/config/node_key.json $CDIR/config/node_key.json
-cp $PDIR/config/priv_validator_key.json $CDIR/config/priv_validator_key.json
+cp ${H}/p/config/node_key.json $CDIR/config/node_key.json
+cp ${H}/p/config/priv_validator_key.json $CDIR/config/priv_validator_key.json
 
 # Get persistent peer address
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
