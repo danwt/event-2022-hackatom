@@ -1,12 +1,11 @@
 #!/bin/bash
 set -eux 
 
-# User balance of stake tokens 
-FIZZ_COINS_P="100000000000stake"
-# User balance of stake tokens 
-FIZZ_COINS_C="100000000000stake"
-# Amount of stake tokens staked
-STAKE_AMT="100000000stake"
+# Amount on genesis
+ACC_AMT="1000000000000stake"
+# Amount to self delegate
+FIZZ_SELF_DELEGATE_AMT="1000000000stake"
+OTHER_SELF_DELEGATE_AMT="90000000stake"
 # Node IP address
 NODE_IP="localhost"
 
@@ -49,7 +48,7 @@ sleep 1
 
 # Create an account with some coins (fizz is key name)
 $PBIN add-genesis-account\
-    fizz $FIZZ_COINS_P\
+    fizz $ACC_AMT\
     --home ${H}/p \
     --keyring-backend test
 
@@ -58,7 +57,7 @@ sleep 1
 # Create a validator using the fizz key, and self-delegate
 # some coins. (here fizz is a keyname and the moniker for the
 # new validator)
-$PBIN gentx fizz $STAKE_AMT\
+$PBIN gentx fizz $FIZZ_SELF_DELEGATE_AMT\
     --moniker fizz \
     --chain-id provider\
     --home ${H}/p\
@@ -158,7 +157,7 @@ $CBIN keys add fizz\
 
 # Create an account with some coins (fizz is key name)
 $CBIN add-genesis-account\
-    fizz $FIZZ_COINS_C\
+    fizz $ACC_AMT\
     --home ${H}/c \
     --keyring-backend test
 

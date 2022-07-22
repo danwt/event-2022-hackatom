@@ -124,28 +124,4 @@ hermes create channel\
 
 sleep 5
 
-hermes --json start &> ${H}/hermes.log &
-
-$PBIN q tendermint-validator-set --home ${H}/p
-$CBIN q tendermint-validator-set --home ${H}/c
-
-DELEGATIONS=$($PBIN q staking delegations \
-	$(jq -r .address fizz_keypair_p.json) \
-	--home ${H}/p -o json)
-
-echo $DELEGATIONS
-
-OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.validator_address)
-
-# delegate some more tokens to see power change
-$PBIN tx staking delegate $OPERATOR_ADDR 8000000stake \
-    --from fizz \
-    --chain-id provider \
-    --home ${H}/p \
-    --keyring-backend test \
-    -y -b block
-
-sleep 13
-
-$PBIN q tendermint-validator-set --home ${H}/p
-$CBIN q tendermint-validator-set --home ${H}/c
+hermes --json start &> ${H}/hermes.log
