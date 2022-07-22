@@ -1,12 +1,15 @@
 #!/bin/bash
 set -eux 
 
-# User balance of stake tokens 
-FIZZ_COINS_P="100000000000stake"
-# User balance of stake tokens 
-FIZZ_COINS_C="100000000000stake"
-# Amount of stake tokens staked
-STAKE_AMT="100000000stake"
+# Home directory
+H="."
+PDIR=${H}/p
+CDIR=${H}/c
+PBIN=interchain-security-pd
+CBIN=interchain-security-cd
+
+HANDLE=fizz
+
 # Node IP address
 NODE_IP="localhost"
 
@@ -18,12 +21,6 @@ CADDR="${NODE_IP}:26645"
 CRPCLADDR="${NODE_IP}:26648"
 CGRPCADDR="${NODE_IP}:9081"
 CP2PLADDR="${NODE_IP}:26646"
-
-# Home directory
-H="."
-
-PBIN=interchain-security-pd
-CBIN=interchain-security-cd
 
 killall hermes 2> /dev/null || true
 
@@ -104,8 +101,8 @@ EOF
 
 
 # Add keys to hermes relayer
-hermes keys add --key-file fizz_keypair_p.json --chain provider
-hermes keys add --key-file fizz_keypair_c.json --chain consumer
+hermes keys add --key-file ${HANDLE}_keypair_p.json --chain provider
+hermes keys add --key-file ${HANDLE}_keypair_c.json --chain consumer
 
 sleep 5
 
