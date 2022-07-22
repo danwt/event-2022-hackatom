@@ -2,7 +2,9 @@
 set -eux 
 
 # User balance of stake tokens 
-USER_COINS="100000000000stake"
+FIZZ_COINS_P="100000000000stake"
+# User balance of stake tokens 
+FIZZ_COINS_C="100000000000stake"
 # Amount of stake tokens staked
 STAKE_AMT="100000000stake"
 # Node IP address
@@ -39,14 +41,13 @@ $PBIN keys\
     --home ${H}/p \
     --keyring-backend test\
     --output json\
-    > fizz_keypair.json 2>&1
+    > fizz_keypair_p.json 2>&1
 
 sleep 1
 
-    # $(jq -r .address fizz_keypair.json) $USER_COINS\
 # Create an account with some coins (fizz is key name)
 $PBIN add-genesis-account\
-    fizz $USER_COINS\
+    fizz $FIZZ_COINS_P\
     --home ${H}/p \
     --keyring-backend test
 
@@ -94,8 +95,8 @@ $PBIN start\
 
 sleep 5
 
-# Build consumer chain proposal file
-tee ${H}/consumer-proposal.json<<EOF
+# Create consumer chain proposal file
+tee ${H}/c-proposal.json<<EOF
 {
     "title": "Create a chain",
     "description": "Gonna be a great chain",
@@ -110,10 +111,12 @@ tee ${H}/consumer-proposal.json<<EOF
 }
 EOF
 
-# Submit consumer chain proposal
-$PBIN tx gov submit-proposal create-consumer-chain ${H}/consumer-proposal.json\
-    --node tcp://${NODE_IP}:26658\
+# Submit consumer chain proposal (fizz is key name,
+# node is the tendermint rpc endpoint for provider)
+$PBIN tx gov submit-proposal create-consumer-chain\
+    ${H}/c-proposal.json\
     --from fizz\
+    --node tcp://${PRPCLADDR}\
     --chain-id provider\
     --home ${H}/p\
     --keyring-backend test\
@@ -122,7 +125,7 @@ $PBIN tx gov submit-proposal create-consumer-chain ${H}/consumer-proposal.json\
 
 sleep 1
 
-# Vote yes to proposal
+# Vote yes to proposal (1 is proposal id, fizz is key name)
 $PBIN tx gov vote 1 yes\
     --from fizz\
     --chain-id provider\
@@ -135,63 +138,65 @@ sleep 5
 
 ## CONSUMER CHAIN ##
 
-# Build genesis file and node directory structure
+# Create default genesis file and node directory
+# (fizz is again a moniker here)
 $CBIN init\
     fizz\
     --chain-id consumer\
-    --home ${H}/consumer
+    --home ${H}/c
 
 sleep 1
 
-# Create user account keypair
+# Create user account keypair (reuse fizz name)
 $CBIN keys add fizz\
-    --home ${H}/consumer\
-    --keyring-backend\
-    test --output json\
-    > ${H}/fizz_cons_keypair.json 2>&1
+    --home ${H}/c\
+    --keyring-backend test\
+    --output json\
+    > ${H}/fizz_keypair_c.json 2>&1
 
-# Add stake to user account
+# Create an account with some coins (fizz is key name)
 $CBIN add-genesis-account\
-    $(jq -r .address fizz_cons_keypair.json)\
-    1000000000stake\
-    --home ${H}/consumer
+    fizz $FIZZ_COINS_C\
+    --home ${H}/c \
+    --keyring-backend test
 
-# Add consumer genesis states to genesis file
+# Fetch consumer genesis state from provider
+# (provider is module name, consumer is a chain-id)
 $PBIN query provider consumer-genesis consumer\
     --home ${H}/p\
-    -o json > ${H}/consumer_gen.json
+    -o json > ${H}/genesis_c.json
 
 jq -s '.[0].app_state.ccvconsumer = .[1] | .[0]'\
-    ${H}/consumer/config/genesis.json ${H}/consumer_gen.json\
-    > ${H}/consumer/edited_genesis.json\
-    && mv ${H}/consumer/edited_genesis.json ${H}/consumer/config/genesis.json
+    ${H}/c/config/genesis.json ${H}/genesis_c.json\
+    > ${H}/c/edited_genesis.json\
+    && mv ${H}/c/edited_genesis.json ${H}/c/config/genesis.json
 
-rm ${H}/consumer_gen.json
+rm ${H}/genesis_c.json
 
-dasel put string -f ${H}/consumer/config/genesis.json .app_state.gov.voting_params.voting_period 3s
-dasel put string -f ${H}/consumer/config/genesis.json .app_state.staking.params.unbonding_time 600s
+dasel put string -f ${H}/c/config/genesis.json .app_state.gov.voting_params.voting_period 3s
+dasel put string -f ${H}/c/config/genesis.json .app_state.staking.params.unbonding_time 600s
 
 # Create validator states
-echo '{"height": "0","round": 0,"step": 0}' > ${H}/consumer/data/priv_validator_state.json
+echo '{"height": "0","round": 0,"step": 0}' > ${H}/c/data/priv_validator_state.json
 
 # Copy validator key files
-cp ${H}/p/config/priv_validator_key.json ${H}/consumer/config/priv_validator_key.json
-cp ${H}/p/config/node_key.json ${H}/consumer/config/node_key.json
+cp ${H}/p/config/priv_validator_key.json ${H}/c/config/priv_validator_key.json
+cp ${H}/p/config/node_key.json ${H}/c/config/node_key.json
 
 # Set default client port
-dasel put string -f ${H}/consumer/config/config.toml .rpc.laddr "tcp://127.0.0.1:26647"
-dasel put string -f ${H}/consumer/config/client.toml .node "tcp://${CRPCLADDR}"
-dasel put string -f ${H}/consumer/config/app.toml .api.address "tcp://0.0.0.0:1318"
-dasel put bool -f ${H}/consumer/config/app.toml .api.enable true
-dasel put bool -f ${H}/consumer/config/app.toml .api.swagger true
-dasel put bool -f ${H}/consumer/config/app.toml .api.enabled-unsafe-cors true
+dasel put string -f ${H}/c/config/config.toml .rpc.laddr "tcp://127.0.0.1:26647"
+dasel put string -f ${H}/c/config/client.toml .node "tcp://${CRPCLADDR}"
+dasel put string -f ${H}/c/config/app.toml .api.address "tcp://0.0.0.0:1318"
+dasel put bool -f ${H}/c/config/app.toml .api.enable true
+dasel put bool -f ${H}/c/config/app.toml .api.swagger true
+dasel put bool -f ${H}/c/config/app.toml .api.enabled-unsafe-cors true
 
 # Start consumer
 $CBIN start\
-    --home ${H}/consumer \
+    --home ${H}/c \
     --address tcp://${CADDR} \
     --rpc.laddr tcp://${CRPCLADDR} \
     --grpc.address ${CGRPCADDR} \
     --p2p.laddr tcp://${CP2PLADDR} \
     --grpc-web.enable=false \
-    &> ${H}/consumer/logs &
+    &> ${H}/c/logs &
