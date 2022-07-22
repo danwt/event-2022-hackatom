@@ -64,6 +64,7 @@ interchain-security-pd tx staking create-validator \
             --moniker <prov-node-moniker> \
             --min-self-delegation 1 \
             -b block -y
+            
 # Verify that your validator node is now part of the validator-set.
 
 interchain-security-pd q tendermint-validator-set --home <prov-node-dir>
@@ -84,19 +85,18 @@ interchain-security-cd keys add <consumer-keyname> \
     --home <cons-node-dir> --output json > <consumer_keyname_keypair>.json 2>&1
 
 # Import Consumer chain genesis file__
-Import the consumer genesis file to your local node folder as explained in the provider chain section point 5 .
+# Import the consumer genesis file to your local node folder as explained in the provider chain section point 5 .
 
 # Import validator keypair node__ 
-The following will copy the required validator keypair files in order to run the same node on the consumer chain.  
+# The following will copy the required validator keypair files in order to run the same node on the consumer chain.  
 
 cp <prov-node-dir>/config/node_key.json <cons-node-dir>/config/node_key.json
 
 cp <prov-node-dir>/config/priv_validator_key.json <cons-node-dir>/config/priv_validator_key.json
 
-# Run the validator node__
-This command will run the validator on the consumer chain.  
+# Run the validator node
+# This command will run the validator on the consumer chain.  
 
-```
 # Get persistent peer address
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' <prov-node-dir>/config/genesis.json)
 
@@ -110,37 +110,29 @@ interchain-security-cd start --home <cons-node-dir> \
         --grpc-web.enable=false \
         --p2p.persistent_peers $CONSUMER_P2P_ADDRESS \
         &> <cons-node-dir>/logs &
-```
-<br/><br/>
 
-__7. Query the consumer chain node__
-Update the node client RPC endpoint using the following command.  
+# Query the consumer chain node__
+# Update the node client RPC endpoint using the following command.  
 
-```
 sed -i -r "/node =/ s/= .*/= \"tcp:\/\/${MY_IP}:26648\"/" <cons-node-dir>/config/client.toml
-```
 
-Query the consumer chain and check that the validator node was added to the validator set.
+# Query the consumer chain and check that the validator node was added to the validator set.
 
-```
 interchain-security-cd q tendermint-validator-set --home <cons-node-dir>
-```
-
----
-
 
 ### Test the CCV protocol
-These optional steps show you how CCV updates the Consumer chain validator-set voting power. In order to do so, we will delegate some tokens to the validator on the Provider chain and verify that the Consumer chain validator-set gets updated.
+# These optional steps show you how CCV updates the Consumer 
+# chain validator-set voting power. In order to do so, we will delegate some tokens
+# to the validator on the Provider chain and verify that the Consumer
+# chain validator-set gets updated.
 
-__1. Delegate tokens__  
-```
+# Delegate tokens
 # Get validator delegations
 DELEGATIONS=$(interchain-security-pd q staking delegations \
     $(jq -r .address <provider-keyname>_keypair.json) --home <prov-node-dir> -o json)
 
 # Get validator operator address
 OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r '.delegation_responses[0].delegation.validator_address')
-
 
 # Delegate tokens
 interchain-security-pd tx staking delegate $OPERATOR_ADDR 1000000stake \
@@ -149,18 +141,14 @@ interchain-security-pd tx staking delegate $OPERATOR_ADDR 1000000stake \
                 --home <prov-node-dir> \
                 --chain-id provider \
                 -y -b block
-```
 
-__2.Check the validator-set__  
-This commands below will print the updated validator consensus info.
+# Check the validator set
 
-```
 # Get validator consensus address
 VAL_ADDR=$(interchain-security-pd tendermint show-address --home <prov-node-dir>)
         
 # Query validator consenus info        
 interchain-security-cd q tendermint-validator-set --home <cons-node-dir> | grep -A11 $VAL_ADDR
-```
 
 
 
