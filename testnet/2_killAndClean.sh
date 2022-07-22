@@ -12,6 +12,5 @@ hermes keys delete --chain consumer --all
 rm -rf ${H}/p
 rm -rf ${H}/c
 rm -f proposal.json
-rm -f fizz_keypair_c.json
-rm -f fizz_keypair_p.json
+rm -f keypair*.json
 rm -f hermes.log

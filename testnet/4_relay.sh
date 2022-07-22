@@ -101,8 +101,8 @@ EOF
 
 
 # Add keys to hermes relayer
-hermes keys add --key-file ${HANDLE}_keypair_p.json --chain provider
-hermes keys add --key-file ${HANDLE}_keypair_c.json --chain consumer
+hermes keys add --key-file keypair_p_${HANDLE}.json --chain provider
+hermes keys add --key-file keypair_c_${HANDLE}.json --chain consumer
 
 sleep 5
 

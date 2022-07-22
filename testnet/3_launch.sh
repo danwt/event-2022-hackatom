@@ -43,7 +43,7 @@ $PBIN keys\
     --home $PDIR \
     --keyring-backend test\
     --output json\
-    > fizz_keypair_p.json 2>&1
+    > keypair_p_${HANDLE}.json 2>&1
 
 sleep 1
 
@@ -154,7 +154,7 @@ $CBIN keys add $HANDLE\
     --home $CDIR\
     --keyring-backend test\
     --output json\
-    > ${H}/fizz_keypair_c.json 2>&1
+    > ${H}/keypair_c_${HANDLE}.json 2>&1
 
 # Create an account with some coins ($HANDLE is key name)
 $CBIN add-genesis-account\

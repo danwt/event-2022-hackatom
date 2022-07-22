@@ -8,7 +8,7 @@ CDIR=${H}/c
 PBIN=interchain-security-pd
 CBIN=interchain-security-cd
 
-HANDLE=$HANDLE
+HANDLE=fizz
 
 ### EXTRA ACTIONS ###
 
@@ -18,7 +18,7 @@ $PBIN q tendermint-validator-set --home $PDIR
 $CBIN q tendermint-validator-set --home $CDIR
 
 DELEGATIONS=$($PBIN q staking delegations \
-	$(jq -r .address ${HANDLE}_keypair_p.json) \
+	$(jq -r .address keypair_p_${HANDLE}.json) \
 	--home $PDIR -o json)
 
 echo $DELEGATIONS
@@ -27,7 +27,7 @@ OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.va
 
 # delegate some more tokens to see power change
 $PBIN tx staking delegate $OPERATOR_ADDR $EXTRA_DELEGATE_AMT \
-    --from $fizz \
+    --from $HANDLE \
     --chain-id provider \
     --home $PDIR \
     --keyring-backend test \
