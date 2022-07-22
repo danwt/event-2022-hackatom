@@ -1,6 +1,12 @@
 #!/bin/bash
 set -eux 
 
+# User balance of stake tokens 
+FIZZ_COINS_P="100000000000stake"
+# User balance of stake tokens 
+FIZZ_COINS_C="100000000000stake"
+# Amount of stake tokens staked
+STAKE_AMT="100000000stake"
 # Node IP address
 NODE_IP="localhost"
 
@@ -21,7 +27,15 @@ CBIN=interchain-security-cd
 
 killall hermes 2> /dev/null || true
 
-# Setup Hermes in packet relayer mode (warning: trusting period may need to be modified)
+# Delete all previous keys in relayer
+hermes keys delete --chain provider --all
+hermes keys delete --chain consumer --all
+
+### RELAYER ###
+
+# Setup Hermes in packet relayer mode
+# (warning: trusting period may need to be modified
+#   if changing unbonding period)
 
 tee ~/.hermes/config.toml<<EOF
 [global]
@@ -88,14 +102,10 @@ websocket_addr = "ws://${PRPCLADDR}/websocket"
        numerator = "1"
 EOF
 
-# Delete all previous keys in relayer
-hermes keys delete --chain consumer --all
-hermes keys delete --chain provider --all
 
-# Restore keys to hermes relayer
-# TODO: think I might need to use --mnemonic-file here
-hermes keys add --key-file fizz_cons_keypair.json --chain consumer
-hermes keys add --key-file fizz_keypair.json --chain provider
+# Add keys to hermes relayer
+hermes keys add --key-file fizz_keypair_p.json --chain provider
+hermes keys add --key-file fizz_keypair_c.json --chain consumer
 
 sleep 5
 
@@ -114,27 +124,28 @@ hermes create channel\
 
 sleep 5
 
-hermes --json start &> ${H}/hermeslog &
+hermes --json start &> ${H}/hermes.log &
 
-$PBIN q tendermint-validator-set --home ${H}/provider
-$CBIN q tendermint-validator-set --home ${H}/consumer
+$PBIN q tendermint-validator-set --home ${H}/p
+$CBIN q tendermint-validator-set --home ${H}/c
 
 DELEGATIONS=$($PBIN q staking delegations \
-	$(jq -r .address fizz_keypair.json) \
-	--home ${H}/provider -o json)
+	$(jq -r .address fizz_keypair_p.json) \
+	--home ${H}/p -o json)
 
 echo $DELEGATIONS
 
 OPERATOR_ADDR=$(echo $DELEGATIONS | jq -r .delegation_responses[0].delegation.validator_address)
 
-$PBIN tx staking delegate $OPERATOR_ADDR 1000000stake \
+# delegate some more tokens to see power change
+$PBIN tx staking delegate $OPERATOR_ADDR 8000000stake \
     --from fizz \
     --chain-id provider \
-    --home ${H}/provider \
+    --home ${H}/p \
     --keyring-backend test \
     -y -b block
 
 sleep 13
 
-$PBIN q tendermint-validator-set --home ${H}/provider
-$CBIN q tendermint-validator-set --home ${H}/consumer
+$PBIN q tendermint-validator-set --home ${H}/p
+$CBIN q tendermint-validator-set --home ${H}/c

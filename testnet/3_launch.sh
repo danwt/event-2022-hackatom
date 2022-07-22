@@ -182,9 +182,11 @@ dasel put string -f ${H}/c/config/genesis.json .app_state.gov.voting_params.voti
 dasel put string -f ${H}/c/config/genesis.json .app_state.staking.params.unbonding_time 600s
 
 # Create validator states
-echo '{"height": "0","round": 0,"step": 0}' > ${H}/c/data/priv_validator_state.json
+# echo '{"height": "0","round": 0,"step": 0}' > ${H}/c/data/priv_validator_state.json
 
-# Copy validator key files
+# Copy validator key files from the provider to be used to sign consumer blocks.
+# We need this because the provider exports a validator set which must be used
+# to validate the first consumer block.
 cp ${H}/p/config/priv_validator_key.json ${H}/c/config/priv_validator_key.json
 cp ${H}/p/config/node_key.json ${H}/c/config/node_key.json
 
