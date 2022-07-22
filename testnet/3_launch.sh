@@ -23,7 +23,7 @@ H="."
 PBIN=interchain-security-pd
 CBIN=interchain-security-cd
 
-./1_kill.sh
+./2_killAndClean.sh
 
 # Build genesis file and node directory structure
 $PBIN init --chain-id provider fizz --home ${H}/provider
@@ -34,9 +34,6 @@ jq ".app_state.gov.voting_params.voting_period = \"3s\"" \
     mv ${H}/provider/edited_genesis.json ${H}/provider/config/genesis.json
 
 sleep 1
-
-# jq condition to reduce unbonding time
-#  | .app_state.staking.params.unbonding_time = \"600s\"
 
 # Create account keypair
 $PBIN keys\
