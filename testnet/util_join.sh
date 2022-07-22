@@ -8,7 +8,6 @@ if [ "$HANDLE" == "" ]; then
    exit 1
 fi
 
-
 # Home directory
 H="."
 PDIR=${H}/p_${HANDLE}
@@ -77,36 +76,23 @@ sleep 5
 # TODO: original comment 'Update the node client RPC endpoint using the following command'
 dasel put string -f $PDIR/config/client.toml node "tcp://${PRPCLADDR}"
 
-# Fund your account
-
-# TODO: send over from god address
-
-# Make sure your node account has at least `x` coins in order to stake.
-# Verify your account balance using the command below.
-$PBIN q\
-    bank balances $(jq -r .address keypair_p_${HANDLE}.json)\
-    --home $PDIR
-
-# Ask to get your local account fauceted or use the command below if you have access
-# to another account at least extra `x` tokens.*
-
 # Get fizz account addresses
 # TODO: parameterise
 SRC_ADDR=$($PBIN keys show fizz \
-       --home ${H}/p --output json | jq '.address')
+    --home ${H}/p --output json | jq '.address')
 
-# Get local account addresses
+# Get local account addresses to receive tokens
 ACC_ADDR=$($PBIN keys show $HANDLE \
-       --home $PDIR --output json | jq '.address')
+    --home $PDIR --output json | jq '.address')
 
 # Get some tokens
 $PBIN tx bank send\
-  $SRC_ADDR $ACC_ADDR \
-  1000000stake\
-  --from fizz\
-  --home $PDIR\
-  --chain-id provider\
-  -b block 
+    $SRC_ADDR $ACC_ADDR \
+    1000000stake\
+    --from fizz\
+    --home $PDIR\
+    --chain-id provider\
+    -b block
 
 sleep 8
 
@@ -115,18 +101,19 @@ VAL_PUBKEY=$($PBIN tendermint show-validator --home $PDIR)
 
 # Create the validator
 $PBIN tx staking create-validator \
-  --amount 1000000stake \
-  --pubkey $VAL_PUBKEY \
-  --moniker $HANDLE \
-  --from $HANDLE \
-  --keyring-backend test \
-  --home $PDIR \
-  --chain-id provider \
-  --commission-max-change-rate 0.01 \
-  --commission-max-rate 0.2 \
-  --commission-rate 0.1 \
-  --min-self-delegation 1 \
-  -b block -y
+    --amount 1000000stake \
+    --pubkey $VAL_PUBKEY \
+    --moniker $HANDLE \
+    --from $HANDLE \
+    --keyring-backend test \
+    --home $PDIR \
+    --chain-id provider \
+    --commission-max-change-rate 0.01 \
+    --commission-max-rate 0.2 \
+    --commission-rate 0.1 \
+    --min-self-delegation 1 \
+    -b block\
+    -y
 
 sleep 5
 
@@ -136,30 +123,28 @@ $PBIN q tendermint-validator-set --home $PDIR
 
 ### CONSUMER ###
 
-rm -rf ${H}/c 
-
 # Init new node directory
 $CBIN init\
     $HANDLE\
     --chain-id consumer\
-    --home ${H}/c
+    --home $CDIR
 
 sleep 1
 
 # Create user account keypair (reuse name)
 $CBIN keys add $HANDLE\
-    --home ${H}/c\
+    --home $CDIR\
     --keyring-backend test\
     --output json\
-     > ${H}/keypair_c_${HANDLE}.json 2>&1
+    > ${H}/keypair_c_${HANDLE}.json 2>&1
 
 # Import Consumer chain genesis file__
 #    as explained in the provider chain section point 5 .
 # TODO:???
 
 # Copy validator keys to consumer directory
-cp $PDIR/config/node_key.json ${H}/c/config/node_key.json
-cp $PDIR/config/priv_validator_key.json ${H}/c/config/priv_validator_key.json
+cp $PDIR/config/node_key.json $CDIR/config/node_key.json
+cp $PDIR/config/priv_validator_key.json $CDIR/config/priv_validator_key.json
 
 # Get persistent peer address
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
@@ -168,20 +153,20 @@ CONSUMER_P2P_ADDRESS=$(echo $COORDINATOR_P2P_ADDRESS | sed 's/:.*/:26646/')
 
 # Start the node
 $CBIN start\
-    --home ${H}/c \
+    --home $CDIR \
     --address tcp://${CADDR} \
     --rpc.laddr tcp://${CRPCLADDR} \
     --grpc.address ${CGRPCADDR} \
     --p2p.laddr tcp://${CP2PLADDR} \
     --grpc-web.enable=false \
     --p2p.persistent_peers $CONSUMER_P2P_ADDRESS \
-    &> ${H}/c/logs &
+    &> $CDIR/logs &
 
 sleep 5
 
 # TODO: can this go BEFORE start?
 # TODO: original comment 'Update the node client RPC endpoint using the following command'
-dasel put string -f ${H}/c/config/client.toml node "tcp://${CRPCLADDR}"
+dasel put string -f $CDIR/config/client.toml node "tcp://${CRPCLADDR}"
 
 # Check consumer validator set
-$CBIN q tendermint-validator-set --home ${H}/c
+$CBIN q tendermint-validator-set --home $CDIR
