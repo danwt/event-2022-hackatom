@@ -11,13 +11,13 @@ fi
 
 # Home directory
 H="."
-PDIR=${H}/p${HANDLE}
-CDIR=${H}/c${HANDLE}
+PDIR=${H}/p_${HANDLE}
+CDIR=${H}/c_${HANDLE}
 PBIN=interchain-security-pd
 CBIN=interchain-security-cd
 
 # Node IP address
-NODE_IP="localhost"
+NODE_IP="127.0.0.2"
 
 PADDR="${NODE_IP}:26655"
 PRPCLADDR="${NODE_IP}:26658"
@@ -31,6 +31,7 @@ CP2PLADDR="${NODE_IP}:26646"
 # Cleanup
 rm -rf $PDIR
 rm -rf $CDIR
+rm *_${HANDLE}.json
 
 ### PROVIDER
 
@@ -47,16 +48,15 @@ $PBIN keys\
     --output json\
     > keypair_p_${HANDLE}.json 2>&1
 
-exit 1
-
 sleep 1
 
 # Get the provider genesis file
-curl -o $PDIR/config/genesis.json https://pastebin.com/<your-pastbin-genesis-dump>
-
-MY_IP=$(host -4 myip.opendns.com resolver1.opendns.com | grep "address" | awk '{print $4}')
+cp ${H}/p/config/genesis.json $PDIR/config/genesis.json
 
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
+
+echo $COORDINATOR_P2P_ADDRESS
+exit 1
 
 # Start the node
 # If you get the error "can't bind address xxx.xxx.x.x"
@@ -81,29 +81,34 @@ dasel put string -f $PDIR/config/client.toml node "tcp://${PRPCLADDR}"
 
 # TODO: send over from god address
 
-# Make sure your node account has at least `1000000stake` coins in order to stake.
+# Make sure your node account has at least `x` coins in order to stake.
 # Verify your account balance using the command below.
 $PBIN q\
     bank balances $(jq -r .address keypair_p_${HANDLE}.json)\
     --home $PDIR
 
 # Ask to get your local account fauceted or use the command below if you have access
-# to another account at least extra `1000000stake` tokens.*
+# to another account at least extra `x` tokens.*
+
+# Get fizz account addresses
+# TODO: parameterise
+SRC_ADDR=$($PBIN keys show fizz \
+       --home ${H}/p --output json | jq '.address')
 
 # Get local account addresses
-ACCOUNT_ADDR=$($PBIN keys show $HANDLE \
-       --home /$PDIR --output json | jq '.address')
+ACC_ADDR=$($PBIN keys show $HANDLE \
+       --home $PDIR --output json | jq '.address')
 
-# Run this command 
+# Get some tokens
 $PBIN tx bank send\
-  <source-address> $ACCOUNT_ADDR \
+  $SRC_ADDR $ACC_ADDR \
   1000000stake\
-  --from <source-keyname>\
+  --from fizz\
   --home $PDIR\
   --chain-id provider\
   -b block 
 
-sleep 5
+sleep 8
 
 # Get the validator node pubkey 
 VAL_PUBKEY=$($PBIN tendermint show-validator --home $PDIR)
@@ -164,10 +169,10 @@ CONSUMER_P2P_ADDRESS=$(echo $COORDINATOR_P2P_ADDRESS | sed 's/:.*/:26646/')
 # Start the node
 $CBIN start\
     --home ${H}/c \
-    --address tcp://${MY_IP}:26645 \
-    --rpc.laddr tcp://${MY_IP}:26648 \
-    --grpc.address ${MY_IP}:9081 \
-    --p2p.laddr tcp://${MY_IP}:26646 \
+    --address tcp://${CADDR} \
+    --rpc.laddr tcp://${CRPCLADDR} \
+    --grpc.address ${CGRPCADDR} \
+    --p2p.laddr tcp://${CP2PLADDR} \
     --grpc-web.enable=false \
     --p2p.persistent_peers $CONSUMER_P2P_ADDRESS \
     &> ${H}/c/logs &

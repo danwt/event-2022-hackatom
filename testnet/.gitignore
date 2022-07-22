@@ -1,7 +1,11 @@
 .DS_Store
-*.json
-c/
-p/
+
+key*.json
+proposal.json
+c*/
+p*/
+
 hermes.log
+
 execa.json
 execa.all.txt
