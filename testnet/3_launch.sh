@@ -4,7 +4,7 @@ set -eux
 # User balance of stake tokens 
 USER_COINS="100000000000stake"
 # Amount of stake tokens staked
-STAKE="100000000stake"
+STAKE_AMT="100000000stake"
 # Node IP address
 NODE_IP="localhost"
 
@@ -25,70 +25,71 @@ CBIN=interchain-security-cd
 
 ./2_killAndClean.sh
 
-# Build genesis file and node directory structure
-$PBIN init --chain-id provider fizz --home ${H}/provider
+# Build genesis file and node directory structure (fizz is node moniker)
+$PBIN init --chain-id provider fizz --home ${H}/p
 
-jq ".app_state.gov.voting_params.voting_period = \"3s\"" \
-    ${H}/provider/config/genesis.json > \
-    ${H}/provider/edited_genesis.json && \
-    mv ${H}/provider/edited_genesis.json ${H}/provider/config/genesis.json
+dasel put string -f ${H}/p/config/genesis.json .app_state.gov.voting_params.voting_period "3s"
 
 sleep 1
 
-# Create account keypair
+# Create a keypair (fizz is key name)
 $PBIN keys\
     add fizz \
-    --home ${H}/provider\
+    --home ${H}/p \
     --keyring-backend test\
     --output json\
     > fizz_keypair.json 2>&1
 
 sleep 1
 
-# Add stake to user
+    # $(jq -r .address fizz_keypair.json) $USER_COINS\
+# Create an account with some coins (fizz is key name)
 $PBIN add-genesis-account\
-    $(jq -r .address fizz_keypair.json) $USER_COINS\
-    --home ${H}/provider\
+    fizz $USER_COINS\
+    --home ${H}/p \
     --keyring-backend test
 
 sleep 1
 
-# Stake 1/1000 user's coins
-$PBIN gentx fizz $STAKE\
+# Create a validator using the fizz key, and self-delegate
+# some coins. (here fizz is a keyname and the moniker for the
+# new validator)
+$PBIN gentx fizz $STAKE_AMT\
+    --moniker fizz \
     --chain-id provider\
-    --home ${H}/provider\
-    --keyring-backend test\
-    --moniker fizz
+    --home ${H}/p\
+    --keyring-backend test
 
 sleep 1
 
+# Collect the genesis transactions and create the genesis file
 $PBIN collect-gentxs\
-    --home ${H}/provider\
-    --gentx-dir ${H}/provider/config/gentx/
+    --home ${H}/p\
+    --gentx-dir ${H}/p/config/gentx/
 
 sleep 1
 
-# config tendermint
+# Configure tendermint
 
-dasel put string -f ${H}/provider/config/client.toml node "tcp://${PRPCLADDR}"
-dasel put string -f ${H}/provider/config/config.toml consensus.timeout_commit 3s
-dasel put string -f ${H}/provider/config/config.toml consensus.timeout_propose 1s
+dasel put string -f ${H}/p/config/client.toml node "tcp://${PRPCLADDR}"
+dasel put string -f ${H}/p/config/config.toml consensus.timeout_commit 3s
+dasel put string -f ${H}/p/config/config.toml consensus.timeout_propose 1s
 
-# config sdk
+# Allow rest api queries to node (for explorer)
 
-dasel put bool -f ${H}/provider/config/app.toml .api.enable true
-dasel put bool -f ${H}/provider/config/app.toml .api.swagger true
-dasel put bool -f ${H}/provider/config/app.toml .api.enabled-unsafe-cors true
+dasel put bool -f ${H}/p/config/app.toml .api.enable true
+dasel put bool -f ${H}/p/config/app.toml .api.swagger true
+dasel put bool -f ${H}/p/config/app.toml .api.enabled-unsafe-cors true
 
-# Start chain (gaia equivalent)
+# Start the provider chain
 $PBIN start\
-    --home ${H}/provider\
+    --home ${H}/p\
     --address tcp://${PADDR}\
     --rpc.laddr tcp://${PRPCLADDR}\
     --grpc.address ${PGRPCADDR}\
     --p2p.laddr tcp://${PP2PLADDR}\
     --grpc-web.enable=false\
-    &> ${H}/provider/logs &
+    &> ${H}/p/logs &
 
 sleep 5
 
@@ -109,7 +110,7 @@ tee ${H}/consumer-proposal.json<<EOF
 EOF
 
 $PBIN keys show fizz\
-    --home ${H}/provider\
+    --home ${H}/p\
     --keyring-backend test
 
 # Submit consumer chain proposal
@@ -117,7 +118,7 @@ $PBIN tx gov submit-proposal create-consumer-chain ${H}/consumer-proposal.json\
     --node tcp://${NODE_IP}:26658\
     --from fizz\
     --chain-id provider\
-    --home ${H}/provider\
+    --home ${H}/p\
     --keyring-backend test\
     -b block\
     -y
@@ -128,7 +129,7 @@ sleep 1
 $PBIN tx gov vote 1 yes\
     --from fizz\
     --chain-id provider\
-    --home ${H}/provider\
+    --home ${H}/p\
     --keyring-backend test\
     -b block\
     -y
@@ -160,7 +161,7 @@ $CBIN add-genesis-account\
 
 # Add consumer genesis states to genesis file
 $PBIN query provider consumer-genesis consumer\
-    --home ${H}/provider\
+    --home ${H}/p\
     -o json > ${H}/consumer_gen.json
 
 jq -s '.[0].app_state.ccvconsumer = .[1] | .[0]'\
@@ -177,8 +178,8 @@ dasel put string -f ${H}/consumer/config/genesis.json .app_state.staking.params.
 echo '{"height": "0","round": 0,"step": 0}' > ${H}/consumer/data/priv_validator_state.json
 
 # Copy validator key files
-cp ${H}/provider/config/priv_validator_key.json ${H}/consumer/config/priv_validator_key.json
-cp ${H}/provider/config/node_key.json ${H}/consumer/config/node_key.json
+cp ${H}/p/config/priv_validator_key.json ${H}/consumer/config/priv_validator_key.json
+cp ${H}/p/config/node_key.json ${H}/consumer/config/node_key.json
 
 # Set default client port
 dasel put string -f ${H}/consumer/config/config.toml .rpc.laddr "tcp://127.0.0.1:26647"
