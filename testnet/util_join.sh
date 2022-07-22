@@ -1,11 +1,15 @@
 ### PROVIDER
 
 # Init new node directory
-$PBIN init <prov-node-moniker> --chain-id provider --home ${H}/p
+$PBIN init --chain-id provider buzz --home ${H}/p
 
-# Generate a new keypair
-$PBIN keys add <provider-keyname> --home ${H}/p\
- --keyring-backend test --output json > <provider_keyname_keypair>.json 2>&1
+# Create a keypair (buzz is key name)
+$PBIN keys\
+    add buzz \
+    --home ${H}/p \
+    --keyring-backend test\
+    --output json\
+    > buzz_keypair_p.json 2>&1
 
 # Get the provider genesis file
 curl -o ${H}/p/config/genesis.json https://pastebin.com/<your-pastbin-genesis-dump>
@@ -15,17 +19,17 @@ MY_IP=$(host -4 myip.opendns.com resolver1.opendns.com | grep "address" | awk '{
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' ${H}/p/config/genesis.json)
 
 # Start the node
-$PBIN start --home ${H}/p \
-        --rpc.laddr tcp://${MY_IP}:26658 \
-        --grpc.address ${MY_IP}:9091 \
-        --address tcp://${MY_IP}:26655 \
-        --p2p.laddr tcp://${MY_IP}:26656 \
-        --grpc-web.enable=false \
-        --p2p.persistent_peers $COORDINATOR_P2P_ADDRESS \
-        &> ${H}/p/logs &
-
 # If you get the error "can't bind address xxx.xxx.x.x"
 # try using `127.0.0.1` instead.
+$PBIN start\
+    --home ${H}/p \
+    --address tcp://${MY_IP}:26655 \
+    --rpc.laddr tcp://${MY_IP}:26658 \
+    --grpc.address ${MY_IP}:9091 \
+    --p2p.laddr tcp://${MY_IP}:26656 \
+    --grpc-web.enable=false \
+    --p2p.persistent_peers $COORDINATOR_P2P_ADDRESS \
+    &> ${H}/p/logs &
 
 # TODO: can this go BEFORE start?
 # TODO: original comment 'Update the node client RPC endpoint using the following command'
@@ -38,14 +42,14 @@ dasel put string -f ${H}/p/config/client.toml node "tcp://${PRPCLADDR}"
 # Make sure your node account has at least `1000000stake` coins in order to stake.
 # Verify your account balance using the command below.
 $PBIN q\
-  bank balances $(jq -r .address <provider-keyname>_keypair.json)\
-  --home $H{/p}
+    bank balances $(jq -r .address buzz_keypair_p.json)\
+    --home ${H}/p
 
 # Ask to get your local account fauceted or use the command below if you have access
 # to another account at least extra `1000000stake` tokens.*
 
 # Get local account addresses
-ACCOUNT_ADDR=$($PBIN keys show <your-keyname> \
+ACCOUNT_ADDR=$($PBIN keys show buzz \
        --home /${H}/p --output json | jq '.address')
 
 # Run this command 
@@ -53,7 +57,7 @@ $PBIN tx bank send\
   <source-address> $ACCOUNT_ADDR \
   1000000stake\
   --from <source-keyname>\
-  --home /${H}/p\
+  --home ${H}/p\
   --chain-id provider\
   -b block 
 
@@ -64,31 +68,39 @@ VAL_PUBKEY=$($PBIN tendermint show-validator --home ${H}/p)
 $PBIN tx staking create-validator \
   --amount 1000000stake \
   --pubkey $VAL_PUBKEY \
-  --from <provider-keyname> \
+  --moniker buzz \
+  --from buzz \
   --keyring-backend test \
   --home ${H}/p \
   --chain-id provider \
   --commission-max-change-rate 0.01 \
   --commission-max-rate 0.2 \
   --commission-rate 0.1 \
-  --moniker <prov-node-moniker> \
   --min-self-delegation 1 \
   -b block -y
 
 # Verify that your validator node is now part of the validator-set.
 
-$PBIN q tendermint-validator-set --home $H{/p}
+$PBIN q tendermint-validator-set --home ${H}/p
 
 ### CONSUMER ###
 
-rm -rf ${H}/ 
+rm -rf ${H}/c 
 
 # Init new node directory
-$CBIN init <cons-node-moniker> --chain-id consumer --home ${H}/c
+$CBIN init\
+    buzz\
+    --chain-id consumer\
+    --home ${H}/c
 
-# Create a new keypair
-$CBIN keys add <consumer-keyname> \
-    --home ${H}/c --output json > <consumer_keyname_keypair>.json 2>&1
+sleep 1
+
+# Create user account keypair (reuse name)
+$CBIN keys add buzz\
+    --home ${H}/c\
+    --keyring-backend test\
+    --output json\
+     > ${H}/buzz_keypair_c.json 2>&1
 
 # Import Consumer chain genesis file__
 #    as explained in the provider chain section point 5 .
@@ -104,14 +116,15 @@ COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' ${H}/p
 CONSUMER_P2P_ADDRESS=$(echo $COORDINATOR_P2P_ADDRESS | sed 's/:.*/:26646/')
 
 # Start the node
-$CBIN start --home ${H}/c \
-        --rpc.laddr tcp://${MY_IP}:26648 \
-        --grpc.address ${MY_IP}:9081 \
-        --address tcp://${MY_IP}:26645 \
-        --p2p.laddr tcp://${MY_IP}:26646 \
-        --grpc-web.enable=false \
-        --p2p.persistent_peers $CONSUMER_P2P_ADDRESS \
-        &> ${H}/c/logs &
+$CBIN start\
+    --home ${H}/c \
+    --address tcp://${MY_IP}:26645 \
+    --rpc.laddr tcp://${MY_IP}:26648 \
+    --grpc.address ${MY_IP}:9081 \
+    --p2p.laddr tcp://${MY_IP}:26646 \
+    --grpc-web.enable=false \
+    --p2p.persistent_peers $CONSUMER_P2P_ADDRESS \
+    &> ${H}/c/logs &
 
 # TODO: can this go BEFORE start?
 # TODO: original comment 'Update the node client RPC endpoint using the following command'
