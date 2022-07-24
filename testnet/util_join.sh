@@ -16,7 +16,7 @@ PBIN=interchain-security-pd
 CBIN=interchain-security-cd
 
 # Node IP address
-NODE_IP="7.7.7.0"
+NODE_IP="127.0.0.2"
 
 # ip addr add $NODE_IP dev etho0 || true # allowed to fail
 
@@ -58,14 +58,15 @@ $PBIN keys\
 
 sleep 1
 
+# TODO:  - not sure if I need this
+echo '{"height": "0","round": 0,"step": 0}' > $PDIR/data/priv_validator_state.json
+
 # Get the provider genesis file
 cp ${H}/p/config/genesis.json $PDIR/config/genesis.json
 
 COORDINATOR_P2P_ADDRESS=$(jq -r '.app_state.genutil.gen_txs[0].body.memo' $PDIR/config/genesis.json)
 
 echo $COORDINATOR_P2P_ADDRESS
-
-exit 1
 
 # Start the node
 # If you get the error "can't bind address xxx.xxx.x.x"
@@ -80,11 +81,16 @@ $PBIN start\
     --p2p.persistent_peers $COORDINATOR_P2P_ADDRESS \
     &> $PDIR/logs &
 
-sleep 5
-
 # TODO: can this go BEFORE start?
 # TODO: original comment 'Update the node client RPC endpoint using the following command'
 dasel put string -f $PDIR/config/client.toml node "tcp://${PRPCLADDR}"
+
+sleep 5
+
+# poll for chain start
+set +e
+until $CBIN query block --node "tcp://${PRPCLADDR}" | grep -q -v '{"block_id":{"hash":"","parts":{"total":0,"hash":""}},"block":null}'; do sleep 0.3 ; done
+set -e
 
 # Get fizz account addresses
 # TODO: parameterise
@@ -94,7 +100,7 @@ DST_ADDR=$(dasel --plain -f keypair_p_buzz.json .address)
 
 # Get some tokens
 $PBIN tx bank send\
-    $SRC_ADDR $SRC_ADDR \
+    $SRC_ADDR $DST_ADDR \
     1000000stake\
     --from fizz\
     --home ${H}/p \
@@ -103,7 +109,7 @@ $PBIN tx bank send\
     -b block\
     -y
 
-sleep 8
+sleep 4
 
 # Get the validator node pubkey 
 VAL_PUBKEY=$($PBIN tendermint show-validator --home $PDIR)

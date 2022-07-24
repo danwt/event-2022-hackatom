@@ -11,7 +11,7 @@ CBIN=interchain-security-cd
 HANDLE=fizz
 
 # Node IP address
-NODE_IP="localhost"
+NODE_IP="127.0.0.1"
 
 PADDR="${NODE_IP}:26655"
 PRPCLADDR="${NODE_IP}:26658"
