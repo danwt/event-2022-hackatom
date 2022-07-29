@@ -1,5 +1,8 @@
 # Interchain Security Track - HackATOM 2022
 
+| ⚛️ [Live Telegram Support Group](https://t.me/+oT1xkO8kBHJiZTdh) ⚛️ |
+| -------- |
+
 Welcome to Interchain Security! Interchain Security enables you to create new blockchain applications of unlimited complexity which can communicate through IBC - all while sharing the security of the Cosmos Hub – a ~$3 Billion market capitalization blockchain at the centre of the growing [Interchain](https://mapofzones.com/?testnet=false&period=24&tableOrderBy=ibcVolume&tableOrderSort=desc&zone=cosmoshub-4)!
 
 This readme will show you how to get started both developing and testing your own Consumer application-specific blockchain ('appchain').
