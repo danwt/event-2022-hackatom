@@ -1,4 +1,4 @@
-# Interchain Security Workshop HackATOM 2022
+# Interchain Security Track - HackATOM 2022
 
 Welcome to Interchain Security! Interchain Security enables you to create new blockchain applications of unlimited complexity which can communicate through IBC - all while sharing the security of the Cosmos Hub!
 
