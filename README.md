@@ -1,8 +1,8 @@
 # Interchain Security Track - HackATOM 2022
 
-Welcome to Interchain Security! Interchain Security enables you to create new blockchain applications of unlimited complexity which can communicate through IBC - all while sharing the security of the Cosmos Hub!
+Welcome to Interchain Security! Interchain Security enables you to create new blockchain applications of unlimited complexity which can communicate through IBC - all while sharing the security of the Cosmos Hub – a ~$3 Billion market capitalization blockchain at the centre of the growing [Interchain](https://mapofzones.com/?testnet=false&period=24&tableOrderBy=ibcVolume&tableOrderSort=desc&zone=cosmoshub-4)!
 
-This readme will show you how to get started developing and testing your own Consumer app chain.
+This readme will show you how to get started both developing and testing your own Consumer application-specific blockchain ('appchain').
 
 Please see our [landing page](https://interchainsecurity.dev/) and [development repository](https://github.com/cosmos/interchain-security/tree/danwt/hackatom) for more information. More resources can be found at the bottom of the page.
 
@@ -10,26 +10,26 @@ Have fun!
 
 ## Developing a Consumer Chain
 
-These instructions show you how to create a custom Consumer chain application and test it with a Provider chain.
+These instructions show you how to create a custom Consumer chain and test it with a provider chain.
 
 ## Installation
 
-These are instructions for developing an interchain-security Consumer chain on Linux/OSX.
+These are instructions for developing an interchain-security consumer chain on Linux/OSX.
 
 ### Prerequisites
 
-To create a Consumer and test it live, Provider and Consumer chain binaries and some utilities are required.
+To create a consumer and test it live, provider and consumer chain binaries and some utilities are required.
 
 ### Chain binaries
 
 ```bash
 # Get the interchain security repo
 git clone -b danwt/hackatom https://github.com/cosmos/interchain-security.git;
-# install the Provider and Consumer starter binaries
+# install the provider and consumer starter binaries
 cd interchain-security && make install;
 ```
 
-You can modify the Consumer app in interchain-security/app/consumer.
+You can modify the consumer app in interchain-security/app/consumer.
 
 ### Hermes Relayer
 
@@ -57,7 +57,7 @@ This script will check that all prerequisites are available.
 bash prerequisites.sh
 ```
 
-## Running Provider and Consumer chains
+## Running provider and consumer chains
 
 You can run the chains and relay packets between them. The scripts help with this
 
@@ -70,12 +70,12 @@ chmod u+x 3_delegate.sh
 chmod u+x 4_createBlogPost.sh
 # Kill any existing process and clean up existing directories and configurations
 ./0_killAndClean.sh
-# Launch a Provider and Consumer chain
+# Launch a provider and consumer chain
 # The script uses the handle fizz for monikers, key names, ect...
 ./1_launch.sh
 # Start Hermes relayer
 ./2_relay.sh
-# Delegate some extra tokens to the Provider validator (demo purposes only, optional)
+# Delegate some extra tokens to the provider validator (demo purposes only, optional)
 ./3_delegate.sh
 # Talk to the Consumer app and create a new blog post (demo purposes only, optional)
 ./4_createBlogPost.sh
@@ -97,10 +97,14 @@ cd explorer;
 yarn install;
 yarn serve;
 ```
+## Considerations for developing your appchain
+
+You are welcome to explore the [Ignite CLI](## Additional resources), a CLI tool that lets you seamlessly deploy a Cosmos-SDK appchain. 
 
 ## Additional resources
 
 - <https://interchainsecurity.dev/>
+- <https://informal.systems/2022/05/09/building-with-interchain-security/>
 - <https://github.com/cosmos/interchain-security/tree/danwt/hackatom>
 - <https://github.com/danwt/hackatom>
 - <https://github.com/cosmos/ibc/tree/marius/ccv/spec/app/ics-028-cross-chain-validation>
