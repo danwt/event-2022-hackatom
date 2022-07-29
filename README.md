@@ -20,8 +20,9 @@ Have fun!
 - [Interchain Security Spec](https://github.com/cosmos/ibc/tree/marius/ccv/spec/app/ics-028-cross-chain-validation)
 - [Ignite CLI (formerly 'Starport')](https://docs.ignite.com/)
 - [Building Cosmos-SDK modules](https://github.com/cosmos/cosmos-sdk/tree/main/docs/building-modules)
-- [cosmwasm Consumer chain (WIP)](https://github.com/Ethernal-Tech/consumer-chain-tool)
-- [Interchain Security Testnet (WIP)](https://github.com/sainoe/IS-testnet)
+- [Hermes IBC packet relayer docs](https://hermes.informal.systems/)
+- [cosmwasm Consumer chain](https://github.com/Ethernal-Tech/consumer-chain-tool)
+- [Interchain Security Testnet](https://github.com/sainoe/IS-testnet)
 
 ## Developing a Consumer Chain
 
