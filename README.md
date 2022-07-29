@@ -99,7 +99,7 @@ yarn serve;
 ```
 ## Considerations for developing your appchain
 
-You are welcome to explore the [Ignite CLI](## Additional resources), a CLI tool that lets you seamlessly deploy a Cosmos-SDK appchain. 
+You are welcome to explore the [Ignite CLI](https://docs.ignite.com/), a CLI tool that lets you seamlessly deploy a Cosmos-SDK appchain. 
 
 ## Additional resources
 
