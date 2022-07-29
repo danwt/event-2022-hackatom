@@ -98,6 +98,12 @@ yarn install;
 yarn serve;
 ```
 
+## Developing custom Consumer app logic
+
+The `hackatom` branch of `cosmos-sdk/interchain-security` contains a `hello` module which can be used as a template module for implementing custom logic on top of the base Consumer app. Please take a look at `interchain-security/x/hello` for the module template, and the wiring in `interchain-security/app/consumer/app.go`.
+
+Consumer chains can run arbitrary application logic, this includes having a native token, governance, ibc communication and anything you can think of!
+
 ## Additional resources
 
 - <https://interchainsecurity.dev/>
