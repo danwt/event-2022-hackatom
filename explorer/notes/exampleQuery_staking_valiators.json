@@ -1,0 +1,28 @@
+{
+  "height": "32",
+  "result": [
+    {
+      "operator_address": "cosmosvaloper18cvhu6frdzk4dzr5aje526gjn0jmhtyltyheww",
+      "consensus_pubkey": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "6pDKdk/V4oyOdCrTrepp88ME9mU4wJrXnLpv07OhKuo="
+      },
+      "status": 3,
+      "tokens": "100000000",
+      "delegator_shares": "100000000.000000000000000000",
+      "description": {
+        "moniker": "fizz"
+      },
+      "unbonding_time": "0001-01-01T00:00:00Z",
+      "commission": {
+        "commission_rates": {
+          "rate": "0.100000000000000000",
+          "max_rate": "0.200000000000000000",
+          "max_change_rate": "0.010000000000000000"
+        },
+        "update_time": "2022-07-21T10:27:39.417919Z"
+      },
+      "min_self_delegation": "1"
+    }
+  ]
+}
