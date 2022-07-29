@@ -110,14 +110,10 @@ yarn install;
 yarn serve;
 ```
 
-## Considerations for developing your appchain
-
-You are welcome to explore the [Ignite CLI](https://docs.ignite.com/), a CLI tool that lets you seamlessly deploy a Cosmos-SDK appchain.
-
 ## Developing custom Consumer app logic
 
 The `hackatom` branch of `cosmos-sdk/interchain-security` contains a `hello` module which can be used as a template module for implementing custom logic on top of the base Consumer app. Please take a look at `interchain-security/x/hello` for the module template, and the wiring in `interchain-security/app/consumer/app.go`. Ultimately the easiest way to create a Consumer app chain during the hackathon is to start from `interchain-security/app/consumer`.
 
 The basis of the Consumer app chain is very close to what [Ignite CLI](https://docs.ignite.com/) gives you. Ignite (formerly 'Starport') is a tool that makes it very easy to create all the boilerplate needed for a brand new chain, module, query or transaction.
 
-Please note, Consumer chains can run arbitrary application logic, this includes having a native token, governance, IBC communication and anything you can think of! So be creative, and definitely don't be concerned about scalability or security issues. Consumer chains will be run on different hardware, enabling full horizontal scalability.
+Please note, Consumer chains can run arbitrary application logic, this includes having a native token, governance, IBC communication and anything you can think of! So be creative, and definitely don't be concerned about scalability or security issues. Consumer chains will be run on different hardware, enabling full horizontal scalability, and security is shared from the Cosmos Hub.
