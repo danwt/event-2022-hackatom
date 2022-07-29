@@ -10,13 +10,15 @@ Have fun!
 
 ## Additional resources
 
-- [Interchain Security landing page](https://interchainsecurity.dev/>)
-- <https://informal.systems/2022/05/09/building-with-interchain-security/>
-- <https://github.com/cosmos/interchain-security/tree/danwt/hackatom>
-- <https://github.com/danwt/hackatom>
-- <https://github.com/cosmos/ibc/tree/marius/ccv/spec/app/ics-028-cross-chain-validation>
-- <https://github.com/Ethernal-Tech/consumer-chain-tool>
-- <https://github.com/sainoe/IS-testnet>
+- [Interchain Security Landing Page](https://interchainsecurity.dev/) 🚀🚀
+- [Blog Post](https://informal.systems/2022/05/09/building-with-interchain-security/)
+- [Interchain Security HackATOM branch](https://github.com/cosmos/interchain-security/tree/danwt/hackatom)
+- [HackATOM workshop repo](https://github.com/danwt/hackatom)
+- [Interchain Security Spec](https://github.com/cosmos/ibc/tree/marius/ccv/spec/app/ics-028-cross-chain-validation)
+- [Ignite CLI (formerly 'Starport')](https://docs.ignite.com/)
+- [Building Cosmos-SDK modules](https://github.com/cosmos/cosmos-sdk/tree/main/docs/building-modules)
+- [cosmwasm Consumer chain (WIP)](https://github.com/Ethernal-Tech/consumer-chain-tool)
+- [Interchain Security Testnet (WIP)](https://github.com/sainoe/IS-testnet)
 
 ## Developing a Consumer Chain
 
@@ -116,6 +118,6 @@ You are welcome to explore the [Ignite CLI](https://docs.ignite.com/), a CLI too
 
 The `hackatom` branch of `cosmos-sdk/interchain-security` contains a `hello` module which can be used as a template module for implementing custom logic on top of the base Consumer app. Please take a look at `interchain-security/x/hello` for the module template, and the wiring in `interchain-security/app/consumer/app.go`. Ultimately the easiest way to create a Consumer app chain during the hackathon is to start from `interchain-security/app/consumer`.
 
-The basis of the Consumer app chain is very close to what [Ignite CLI](https://docs.ignite.com/). Ignite is a tool that makes it very easy to create all the boilerplate needed for a brand new chain.
+The basis of the Consumer app chain is very close to what [Ignite CLI](https://docs.ignite.com/) gives you. Ignite (formerly 'Starport') is a tool that makes it very easy to create all the boilerplate needed for a brand new chain, module, query or transaction.
 
-Please note, Consumer chains can run arbitrary application logic, this includes having a native token, governance, ibc communication and anything you can think of! So be creative, and definitely don't be concerned about scalability or security issues. Consumer chains will be run on different hardware, enabling full horizontal scalability.
+Please note, Consumer chains can run arbitrary application logic, this includes having a native token, governance, IBC communication and anything you can think of! So be creative, and definitely don't be concerned about scalability or security issues. Consumer chains will be run on different hardware, enabling full horizontal scalability.
