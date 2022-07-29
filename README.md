@@ -5,6 +5,8 @@
 
 Welcome to Interchain Security! Interchain Security enables you to create new blockchain applications of unlimited complexity which can communicate through IBC - all while sharing the security of the Cosmos Hub – a ~$3 Billion market capitalization blockchain at the centre of the growing [Interchain](https://mapofzones.com/?testnet=false&period=24&tableOrderBy=ibcVolume&tableOrderSort=desc&zone=cosmoshub-4)!
 
+[![asset](./asset.png)](https://interchainsecurity.dev/)
+
 This readme will show you how to get started both developing and testing your own Consumer application-specific blockchain ('appchain').
 
 Please see our [landing page](https://interchainsecurity.dev/) and [development repository](https://github.com/cosmos/interchain-security/tree/danwt/hackatom) for more information. More resources can be found at the bottom of the page.
