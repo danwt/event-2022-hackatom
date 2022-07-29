@@ -10,26 +10,26 @@ Have fun!
 
 ## Developing a Consumer Chain
 
-These instructions show you how to create a custom Consumer chain application and test it with a provider chain.
+These instructions show you how to create a custom Consumer chain application and test it with a Provider chain.
 
 ## Installation
 
-These are instructions for developing an interchain-security consumer chain on Linux/OSX.
+These are instructions for developing an interchain-security Consumer chain on Linux/OSX.
 
 ### Prerequisites
 
-To create a consumer and test it live, provider and consumer chain binaries and some utilities are required.
+To create a Consumer and test it live, Provider and Consumer chain binaries and some utilities are required.
 
 ### Chain binaries
 
 ```bash
 # Get the interchain security repo
 git clone -b danwt/hackatom https://github.com/cosmos/interchain-security.git;
-# install the provider and consumer starter binaries
+# install the Provider and Consumer starter binaries
 cd interchain-security && make install;
 ```
 
-You can modify the consumer app in interchain-security/app/consumer.
+You can modify the Consumer app in interchain-security/app/consumer.
 
 ### Hermes Relayer
 
@@ -57,7 +57,7 @@ This script will check that all prerequisites are available.
 bash prerequisites.sh
 ```
 
-## Running provider and consumer chains
+## Running Provider and Consumer chains
 
 You can run the chains and relay packets between them. The scripts help with this
 
@@ -70,12 +70,12 @@ chmod u+x 3_delegate.sh
 chmod u+x 4_createBlogPost.sh
 # Kill any existing process and clean up existing directories and configurations
 ./0_killAndClean.sh
-# Launch a provider and consumer chain
+# Launch a Provider and Consumer chain
 # The script uses the handle fizz for monikers, key names, ect...
 ./1_launch.sh
 # Start Hermes relayer
 ./2_relay.sh
-# Delegate some extra tokens to the provider validator (demo purposes only, optional)
+# Delegate some extra tokens to the Provider validator (demo purposes only, optional)
 ./3_delegate.sh
 # Talk to the Consumer app and create a new blog post (demo purposes only, optional)
 ./4_createBlogPost.sh
