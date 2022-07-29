@@ -21,3 +21,11 @@ then
 fi
 
 echo "dasel version is 1.^ - OK."
+
+if ! node --version | grep -q "v16"; 
+then
+  echo "Require node 16.^";
+  exit 1;
+fi
+
+echo "node version is 16.^ - OK."
