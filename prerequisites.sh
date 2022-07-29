@@ -29,3 +29,19 @@ then
 fi
 
 echo "node version is 16.^ - OK."
+
+if ! interchain-security-pd | grep -q "Stargate Cosmos"; 
+then
+  echo "Require interchain-security-pd (provider binary)"
+  exit 1;
+fi
+
+echo "interchain-security-pd is available - OK."
+
+if ! interchain-security-cd | grep -q "Stargate Cosmos"; 
+then
+  echo "Require interchain-security-cd (consumer binary)"
+  exit 1;
+fi
+
+echo "interchain-security-cd is available - OK."
