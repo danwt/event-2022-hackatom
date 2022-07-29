@@ -1,5 +1,13 @@
 # Interchain Security Workshop HackATOM 2022
 
+Welcome to Interchain Security! Interchain Security enables you to create new blockchain applications of unlimited complexity which can communicate through IBC - all while sharing the security of the Cosmos Hub!
+
+This readme will show you how to get started developing and testing your own Consumer app chain.
+
+Please see our [landing page](https://interchainsecurity.dev/) and [development repository](https://github.com/cosmos/interchain-security/tree/danwt/hackatom) for more information. More resources can be found at the bottom of the page.
+
+Have fun!
+
 ## Developing a Consumer Chain
 
 These instructions show you how to create a custom Consumer chain application and test it with a provider chain.
@@ -41,22 +49,12 @@ brew install node@16
 npm install --global yarn;
 ```
 
-## Check everything is installed
+### Check everything is installed
 
 This script will check that all prerequisites are available.
 
 ```bash
 bash prerequisites.sh
-```
-
-## Running the explorer
-
-The chain explorer web site can be served locally on `localhost:8080`.
-
-```bash
-cd explorer;
-yarn install;
-yarn serve;
 ```
 
 ## Running provider and consumer chains
@@ -73,6 +71,7 @@ chmod u+x 4_createBlogPost.sh
 # Kill any existing process and clean up existing directories and configurations
 ./0_killAndClean.sh
 # Launch a provider and consumer chain
+# The script uses the handle fizz for monikers, key names, ect...
 ./1_launch.sh
 # Start Hermes relayer
 ./2_relay.sh
@@ -88,3 +87,22 @@ I recommend taking a look at the scripts to see what is going on. For playing wi
 alias pbin="interchain-security-pd"
 alias cbin="interchain-security-cd"
 ```
+
+## Running the explorer
+
+The chain explorer web site can be served locally on `localhost:8080`.
+
+```bash
+cd explorer;
+yarn install;
+yarn serve;
+```
+
+## Additional resources
+
+- <https://interchainsecurity.dev/>
+- <https://github.com/cosmos/interchain-security/tree/danwt/hackatom>
+- <https://github.com/danwt/hackatom>
+- <https://github.com/cosmos/ibc/tree/marius/ccv/spec/app/ics-028-cross-chain-validation>
+- <https://github.com/Ethernal-Tech/consumer-chain-tool>
+- <https://github.com/sainoe/IS-testnet>

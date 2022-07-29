@@ -84,17 +84,12 @@ function processMenu() {
   }
   chainMenus.push({
     title: 'Interchain Sec Repo',
-    href: 'https://github.com/cosmos/interchain-security',
+    href: 'https://github.com/cosmos/interchain-security/tree/danwt/hackatom',
     icon: 'GithubIcon',
   })
   chainMenus.push({
     title: 'Tools for HackAtom',
     href: 'https://github.com/danwt/hackatom',
-    icon: 'GithubIcon',
-  })
-  chainMenus.push({
-    title: 'Testnet Repo',
-    href: 'https://github.com/sainoe/IS-testnet',
     icon: 'GithubIcon',
   })
   chainMenus.push({
